@@ -21,7 +21,10 @@
 #include <ctype.h>
 #include <stdbool.h>
 
+const int MAX_SIZE = 1024;
+
 bool isEndOf(char[]);
+void structureRequest(char[], char, char, char);
 
 /****************************************************************************
  Function:		main
@@ -51,6 +54,8 @@ int main(int argc, char **argv)
   szGetResponse[0] = '\0';
   receiveBuffer[0] = '\0';
 
+  structureRequest(szGetRequest, *argv[3], *argv[4], *argv[5]);
+
   connSocket = socket(AF_INET, SOCK_STREAM, 0);
   sConnAddr.sin_family = AF_INET;
   sConnAddr.sin_port = htons(HTTP_PORT);
@@ -63,14 +68,6 @@ int main(int argc, char **argv)
   }
   
   connect(connSocket, (struct sockaddr *) &sConnAddr, sizeof(sConnAddr));
-
-  strncat(szGetRequest, "CALCULATE MATH/1.0\nOperand 1: ", (MAX_SIZE - strlen(szGetRequest)) - 1 );
-  strncat(szGetRequest, argv[3], (MAX_SIZE - strlen(szGetRequest)) - 1 );
-  strncat(szGetRequest, "\nOperator: ", (MAX_SIZE - strlen(szGetRequest)) - 1 );
-  strncat(szGetRequest, argv[4], (MAX_SIZE - strlen(szGetRequest)) - 1 );
-  strncat(szGetRequest, "\nOperand2: ", (MAX_SIZE - strlen(szGetRequest)) - 1 );
-  strncat(szGetRequest, argv[5], (MAX_SIZE - strlen(szGetRequest)) - 1 );
-  strncat(szGetRequest, "\nConnection: Close\n\n", (MAX_SIZE - strlen(szGetRequest)) - 1 );
   
   printf(">|%s<|\n\n", szGetRequest);
 
@@ -95,6 +92,8 @@ int main(int argc, char **argv)
 
     bIsFound = isEndOf(szGetResponse);
   }
+
+  printf("%s", szGetResponse);
   
   close(connSocket);
 
@@ -103,7 +102,7 @@ int main(int argc, char **argv)
 /****************************************************************************
  Function:		  
  
-Description:	  
+ Description:	  
  
  Parameters:	  
  
@@ -114,5 +113,24 @@ bool isEndOf(char response[])
   char* pStr = NULL;
   pStr = strstr(response, "\n\n");
 
-  return (NULL == pStr);
+  return (NULL != pStr);
+}
+/****************************************************************************
+ Function:		  
+ 
+ Description:	  
+ 
+ Parameters:	  
+ 
+ Returned:		  
+****************************************************************************/
+void structureRequest(char szGetRequest[], char operand1, char operator, char operand2)
+{
+  strncat(szGetRequest, "CALCULATE MATH/1.0\nOperand 1: ", (MAX_SIZE - strlen(szGetRequest)) - 1 );
+  strncat(szGetRequest, &operand1, (MAX_SIZE - strlen(szGetRequest)) - 1 );
+  strncat(szGetRequest, "\nOperator: ", (MAX_SIZE - strlen(szGetRequest)) - 1 );
+  strncat(szGetRequest, &operator, (MAX_SIZE - strlen(szGetRequest)) - 1 );
+  strncat(szGetRequest, "\nOperand2: ", (MAX_SIZE - strlen(szGetRequest)) - 1 );
+  strncat(szGetRequest, &operand2, (MAX_SIZE - strlen(szGetRequest)) - 1 );
+  strncat(szGetRequest, "\nConnection: Close\n\n", (MAX_SIZE - strlen(szGetRequest)) - 1 );
 }
