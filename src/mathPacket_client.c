@@ -23,10 +23,13 @@
 #include <stdbool.h>
 
 const int MAX_SIZE = 1024;
+const char NEW_LINE = '\n';
 
 bool isEndOf(char[]);
 void structureRequest(char[], char*, char*, char*);
-void formatResponse(char[]);
+void formatXstrings(char[]);
+bool checkHeader(char response[], char header[]);
+void formatStrings(char[]);
 
 /****************************************************************************
  Function:		main
@@ -96,7 +99,7 @@ int main(int argc, char **argv)
     bIsFound = isEndOf(szGetResponse);
   }
 
-  formatResponse(szGetResponse);
+  formatXstrings(szGetResponse);
 
   printf("%s", szGetResponse);
   
@@ -143,7 +146,7 @@ void structureRequest(char szGetRequest[], char* operand1, char* operator, char*
   strncat(szGetRequest, "\nConnection: Close\n\n", (MAX_SIZE - strlen(szGetRequest)) - 1);
 }
 /****************************************************************************
- Function:		  formatResponse
+ Function:		  formatXstrings
  
  Description:	  Takes every line in a server response and puts the lines that
                 start with an X at the end of the response
@@ -152,9 +155,8 @@ void structureRequest(char szGetRequest[], char* operand1, char* operator, char*
  
  Returned:		  none
 ****************************************************************************/
-void formatResponse(char response[])
+void formatXstrings(char response[])
 {
-  const char NEW_LINE = '\n';
   char* pStr = NULL, *pLine = NULL;
   char tempX[MAX_SIZE];
   char temp[MAX_SIZE];
@@ -185,4 +187,65 @@ void formatResponse(char response[])
 
   memset(response, '\0', MAX_SIZE);
   strncat(response, temp, (MAX_SIZE - strlen(response)) - 1 );
+}
+/****************************************************************************
+ Function:		  
+ 
+ Description:	  
+ 
+ Parameters:	  response - 
+ 
+ Returned:		  none
+****************************************************************************/
+bool checkHeader(char response[], char header[])
+{
+  char* pStr, *pEnd, *pIsFound = NULL;
+
+  pStr = strstr(response, header);
+  pEnd = pStr;
+  bool bStatus;
+
+  if (NULL != pStr)
+  { 
+    while(NEW_LINE != *pEnd)
+    {
+      pEnd++;
+    }
+  }
+
+  *pEnd = '\0';
+
+  pIsFound = strstr(pStr, "True");
+ 
+  if (NULL != pIsFound)
+  {
+    bStatus = true;
+  }
+  else 
+  {
+    pIsFound = strstr(pStr, "False");
+    
+    if (NULL != pIsFound)
+    {
+    bStatus = false;
+    }
+  }
+
+  *pEnd = NEW_LINE;
+
+  return bStatus;
+}
+/****************************************************************************
+ Function:		  formatStrings
+ 
+ Description:	  
+ 
+ Parameters:	  response - the server response that is formatted
+ 
+ Returned:		  none
+****************************************************************************/
+void formatStrings(char response[])
+{
+  checkHeader(response, "Rounding");
+  checkHeader(response, "Overflow");
 }
