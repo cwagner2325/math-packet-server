@@ -1,10 +1,11 @@
 //***************************************************************************
-// File name:		
+// File name:		mathPacket_client.c
 // Author:			Cayden Wagner
 // Date:				October 19 2021
 // Class:				CS 360
-// Assignment:	
-// Purpose:			
+// Assignment:	mathPacket
+// Purpose:			To interact with the mathPacket server by sending a request 
+//              and printing the response
 //***************************************************************************
 
 #define _GNU_SOURCE
@@ -25,11 +26,13 @@ const int MAX_SIZE = 1024;
 
 bool isEndOf(char[]);
 void structureRequest(char[], char*, char*, char*);
+void formatResponse(char[]);
 
 /****************************************************************************
  Function:		main
  
- Description:	
+ Description:	Sends a request to the math packet server and prints the 
+              response
  
  Parameters:	int argc: number of command line arguments
 							char **argv: the command line arguments
@@ -93,6 +96,8 @@ int main(int argc, char **argv)
     bIsFound = isEndOf(szGetResponse);
   }
 
+  formatResponse(szGetResponse);
+
   printf("%s", szGetResponse);
   
   close(connSocket);
@@ -100,13 +105,13 @@ int main(int argc, char **argv)
   return EXIT_SUCCESS; 
 }
 /****************************************************************************
- Function:		  
+ Function:		  isEndOf
  
- Description:	  
+ Description:	  determines if the string passed in contains \n\n
  
- Parameters:	  
+ Parameters:	  response - the response that is parsed for \n\n characters
  
- Returned:		  
+ Returned:		  true if \n\n is found, else false
 ****************************************************************************/
 bool isEndOf(char response[])
 {
@@ -116,13 +121,16 @@ bool isEndOf(char response[])
   return (NULL != pStr);
 }
 /****************************************************************************
- Function:		  
+ Function:		  structurerResponse
  
- Description:	  
+ Description:	  Structures a server request in the correct format
  
- Parameters:	  
+ Parameters:	  szGetRequest - an array of chars that holds the request
+                operand1     - the first operand in the equation
+                operator     - the operator in the equation
+                operand2     - the second operand in the equation
  
- Returned:		  
+ Returned:		  none
 ****************************************************************************/
 void structureRequest(char szGetRequest[], char* operand1, char* operator, char* operand2)
 {
@@ -133,4 +141,48 @@ void structureRequest(char szGetRequest[], char* operand1, char* operator, char*
   strncat(szGetRequest, "\nOperand2: ", (MAX_SIZE - strlen(szGetRequest)) - 1 );
   strncat(szGetRequest, operand2, (MAX_SIZE - strlen(szGetRequest)) - 1 );
   strncat(szGetRequest, "\nConnection: Close\n\n", (MAX_SIZE - strlen(szGetRequest)) - 1);
+}
+/****************************************************************************
+ Function:		  formatResponse
+ 
+ Description:	  Takes every line in a server response and puts the lines that
+                start with an X at the end of the response
+ 
+ Parameters:	  response - the server response that is formatted
+ 
+ Returned:		  none
+****************************************************************************/
+void formatResponse(char response[])
+{
+  const char NEW_LINE = '\n';
+  char* pStr = NULL, *pLine = NULL;
+  char tempX[MAX_SIZE];
+  char temp[MAX_SIZE];
+
+  memset(temp, '\0', MAX_SIZE);
+  memset(tempX, '\0', MAX_SIZE);
+
+  pLine = strtok(response, "\n");
+
+  while(NULL != pLine)
+  {  
+    pStr = strstr(pLine, "X");
+
+    if(NULL != pStr)
+    {
+      strncat(tempX, pLine, (MAX_SIZE - strlen(tempX)) - 1 );
+      tempX[strlen(tempX)] = NEW_LINE;
+    }
+    else
+    {
+      strncat(temp, pLine, (MAX_SIZE - strlen(temp)) - 1 );
+      temp[strlen(temp)] = NEW_LINE;
+    }
+    pLine = strtok(NULL, "\n");
+  } 
+
+  strncat(temp, tempX, (MAX_SIZE - strlen(temp)) - 1 );
+
+  memset(response, '\0', MAX_SIZE);
+  strncat(response, temp, (MAX_SIZE - strlen(response)) - 1 );
 }
