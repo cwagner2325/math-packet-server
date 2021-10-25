@@ -28,6 +28,9 @@ void structureRequest(char[], const char*, const char*, const char*);
 void recieveMathPacket(int, char[]);
 void printSeperator();
 bool isEndOf(char[]);
+void structureResponse(char[]);
+void structureBadRequest(char[], const char*, const char*, const char*);
+void structureTimeoutRequest(char[], const char*, const char*, const char*);
 
 /****************************************************************************
  Function:		main
@@ -65,17 +68,154 @@ int main(int argc, char **argv)
   connect(connSocket, (struct sockaddr *) &sConnAddr, sizeof(sConnAddr));
 
   printSeperator();
+  printf("Expected Code: 200\n\n");
 
   memset(szGetRequest, '\0', MAX_SIZE);
   memset(szGetResponse, '\0', MAX_SIZE);
 
   structureRequest(szGetRequest, &GOOD_OPERAND, &BAD_OPERATOR, &GOOD_OPERAND);
-  
   printf("%s\n", szGetRequest);
 
   send(connSocket, szGetRequest, strlen(szGetRequest), 0);
 
   recieveMathPacket(connSocket, szGetResponse);
+  structureResponse(szGetResponse);
+  
+  printf("%s", szGetResponse);
+
+  close(connSocket);
+
+  printSeperator();
+  printf("\n");
+
+  connSocket = socket(AF_INET, SOCK_STREAM, 0);
+  sConnAddr.sin_family = AF_INET;
+  sConnAddr.sin_port = htons(atoi(argv[2]));
+  inet_aton(argv[1], &sConnAddr.sin_addr);
+
+  if (-1 == connSocket)
+  {
+     perror("socket failed!\n");
+     return -1;
+  }
+
+  connect(connSocket, (struct sockaddr *) &sConnAddr, sizeof(sConnAddr));
+
+  printSeperator();
+  printf("Expected Code: 201\n\n");
+
+  memset(szGetRequest, '\0', MAX_SIZE);
+  memset(szGetResponse, '\0', MAX_SIZE);
+
+  structureRequest(szGetRequest, &BAD_OPERAND, &GOOD_OPERATOR, &GOOD_OPERAND);
+  printf("%s\n", szGetRequest);
+
+  send(connSocket, szGetRequest, strlen(szGetRequest), 0);
+
+  recieveMathPacket(connSocket, szGetResponse);
+  structureResponse(szGetResponse);
+  
+  printf("%s", szGetResponse);
+
+  close(connSocket);
+
+  printSeperator();
+  printf("\n");
+
+  connSocket = socket(AF_INET, SOCK_STREAM, 0);
+  sConnAddr.sin_family = AF_INET;
+  sConnAddr.sin_port = htons(atoi(argv[2]));
+  inet_aton(argv[1], &sConnAddr.sin_addr);
+
+  if (-1 == connSocket)
+  {
+     perror("socket failed!\n");
+     return -1;
+  }
+
+  connect(connSocket, (struct sockaddr *) &sConnAddr, sizeof(sConnAddr));
+
+  printSeperator();
+  printf("Expected Code: 202\n\n");
+
+  memset(szGetRequest, '\0', MAX_SIZE);
+  memset(szGetResponse, '\0', MAX_SIZE);
+
+  structureRequest(szGetRequest, &GOOD_OPERAND, &GOOD_OPERATOR, &BAD_OPERAND);
+  printf("%s\n", szGetRequest);
+
+  send(connSocket, szGetRequest, strlen(szGetRequest), 0);
+
+  recieveMathPacket(connSocket, szGetResponse);
+  structureResponse(szGetResponse);
+  
+  printf("%s", szGetResponse);
+
+  close(connSocket);
+
+  printSeperator();
+  printf("\n");
+
+  connSocket = socket(AF_INET, SOCK_STREAM, 0);
+  sConnAddr.sin_family = AF_INET;
+  sConnAddr.sin_port = htons(atoi(argv[2]));
+  inet_aton(argv[1], &sConnAddr.sin_addr);
+
+  if (-1 == connSocket)
+  {
+     perror("socket failed!\n");
+     return -1;
+  }
+
+  connect(connSocket, (struct sockaddr *) &sConnAddr, sizeof(sConnAddr));
+
+  printSeperator();
+  printf("Expected Code: 300\n\n");
+
+  memset(szGetRequest, '\0', MAX_SIZE);
+  memset(szGetResponse, '\0', MAX_SIZE);
+
+  structureBadRequest(szGetRequest, &GOOD_OPERAND, &GOOD_OPERATOR, &GOOD_OPERAND);
+  printf("%s\n", szGetRequest);
+
+  send(connSocket, szGetRequest, strlen(szGetRequest), 0); 
+
+  recieveMathPacket(connSocket, szGetResponse);
+  structureResponse(szGetResponse);
+  
+  printf("%s", szGetResponse);
+
+  close(connSocket);
+
+  printSeperator();
+  printf("\n");
+
+  connSocket = socket(AF_INET, SOCK_STREAM, 0);
+  sConnAddr.sin_family = AF_INET;
+  sConnAddr.sin_port = htons(atoi(argv[2]));
+  inet_aton(argv[1], &sConnAddr.sin_addr);
+
+  if (-1 == connSocket)
+  {
+     perror("socket failed!\n");
+     return -1;
+  }
+
+  connect(connSocket, (struct sockaddr *) &sConnAddr, sizeof(sConnAddr));
+
+  printSeperator();
+  printf("Expected Code: 400\n\n");
+
+  memset(szGetRequest, '\0', MAX_SIZE);
+  memset(szGetResponse, '\0', MAX_SIZE);
+
+  structureTimeoutRequest(szGetRequest, &GOOD_OPERAND, &GOOD_OPERATOR, &GOOD_OPERAND);
+  printf("%s\n", szGetRequest);
+
+  send(connSocket, szGetRequest, strlen(szGetRequest), 0); 
+
+  recieveMathPacket(connSocket, szGetResponse);
+  structureResponse(szGetResponse);
   
   printf("%s", szGetResponse);
 
@@ -86,7 +226,7 @@ int main(int argc, char **argv)
   return EXIT_SUCCESS;
 }
 /****************************************************************************
- Function:		  structureResponse
+ Function:		  structureRequest
  
  Description:	  Structures a server request in the correct format
  
@@ -151,6 +291,8 @@ void recieveMathPacket(int connSocket, char szGetResponse[])
   char receiveBuffer[MAX_SIZE], response[MAX_SIZE];
   bool bIsFound = false;
 
+  response[0] = '\0';
+
   if (recv(connSocket, &receiveBuffer, MAX_SIZE, 0) <= 0)
   {
     perror("recieve failed!\n");
@@ -171,4 +313,117 @@ void recieveMathPacket(int connSocket, char szGetResponse[])
     bIsFound = isEndOf(response);
   }
   memcpy(szGetResponse, response, strlen(response));
+}
+/****************************************************************************
+ Function:		  
+ 
+ Description:	  
+ 
+ Parameters:	  
+ 
+ Returned:		  
+****************************************************************************/
+void structureResponse(char response[])
+{
+  const int TIMEOUT_CODE = 400, OK_CODE = 100;
+  char* pStr = NULL;
+  char* pEnd = NULL;
+  char newResponse[MAX_SIZE];
+  
+  newResponse[0] = '\0';
+  memset(newResponse, '\0', MAX_SIZE);
+
+  pStr = strstr(response, "MATH/");
+
+  while(!isspace(*pStr))
+  {
+    pStr++;
+  }
+
+  pEnd = pStr;
+  pEnd++;
+
+  while(!isspace(*pEnd))
+  {
+    pEnd++;
+  }
+
+  *pEnd = '\0';
+
+  if (OK_CODE != atoi(pStr))
+  {
+    strncat(newResponse, "Response Code:", (MAX_SIZE - strlen(newResponse)) - 1 );
+    strncat(newResponse, pStr, (MAX_SIZE - strlen(newResponse)) - 1 );
+    strncat(newResponse, "\nResponse Message:", (MAX_SIZE - strlen(newResponse)) - 1 );
+
+    *pEnd = ' ';
+
+    if (TIMEOUT_CODE == atoi(pStr))
+    {
+      strncat(newResponse, " Timeout\n", (MAX_SIZE - strlen(newResponse)) - 1 );
+    }
+    else
+    {
+      pStr = pEnd;
+
+      while('\n' != *pEnd)
+      {
+        pEnd++;
+      }
+
+      *pEnd = '\0';
+      strncat(newResponse, pStr, (MAX_SIZE - strlen(newResponse)) - 1 );
+      newResponse[strlen(newResponse)] = '\n';
+      *pEnd = '\n';
+    }
+
+    response[0] = '\0';
+    memcpy(response, newResponse, MAX_SIZE);
+  }
+}
+/****************************************************************************
+ Function:		  structureBadRequest
+ 
+ Description:	  Structures a server request in the incorrect format
+ 
+ Parameters:	  szGetRequest - an array of chars that holds the request
+                operand1     - the first operand in the equation
+                operator     - the operator in the equation
+                operand2     - the second operand in the equation
+ 
+ Returned:		  none
+****************************************************************************/
+void structureTimeoutRequest(char szGetRequest[], const char* operand1, 
+                      const char* operator, const char* operand2)
+{
+  strncat(szGetRequest, "CALCULATE MATH/1.0\nOperand1: ", (MAX_SIZE - strlen(szGetRequest)) - 1 );
+  szGetRequest[strlen(szGetRequest)] = *operand1;
+  strncat(szGetRequest, "\nOperator: ", (MAX_SIZE - strlen(szGetRequest)) - 1 );
+  szGetRequest[strlen(szGetRequest)] = *operator;
+  strncat(szGetRequest, "\nOperand2: ", (MAX_SIZE - strlen(szGetRequest)) - 1 );
+  szGetRequest[strlen(szGetRequest)] = *operand2;
+  strncat(szGetRequest, "\nConnection: Close\n", (MAX_SIZE - strlen(szGetRequest)) - 1);
+}
+/****************************************************************************
+ Function:		  structureBadRequest
+ 
+ Description:	  Structures a server request in the incorrect format
+ 
+ Parameters:	  szGetRequest - an array of chars that holds the request
+                operand1     - the first operand in the equation
+                operator     - the operator in the equation
+                operand2     - the second operand in the equation
+ 
+ Returned:		  none
+****************************************************************************/
+void structureBadRequest(char szGetRequest[], const char* operand1, 
+                      const char* operator, const char* operand2)
+{
+  strncat(szGetRequest, "CALCULATE MATH/1.0\nOperand1: ", (MAX_SIZE - strlen(szGetRequest)) - 1 );
+  szGetRequest[strlen(szGetRequest)] = *operand1;
+  strncat(szGetRequest, "\nOperator: ", (MAX_SIZE - strlen(szGetRequest)) - 1 );
+  szGetRequest[strlen(szGetRequest)] = *operator;
+  strncat(szGetRequest, "\nOpera: ", (MAX_SIZE - strlen(szGetRequest)) - 1 );
+  szGetRequest[strlen(szGetRequest)] = *operand2;
+  strncat(szGetRequest, "\nConnection: Close\n\n", (MAX_SIZE - strlen(szGetRequest)) - 1);
 }
