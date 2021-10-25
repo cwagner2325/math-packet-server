@@ -25,6 +25,7 @@
 const int MAX_SIZE = 1024;
 
 void structureRequest(char[], const char*, const char*, const char*);
+void recieveMathPacket(int, char[]);
 void printSeperator();
 bool isEndOf(char[]);
 
@@ -44,12 +45,9 @@ int main(int argc, char **argv)
   const char GOOD_OPERATOR = '+', BAD_OPERATOR = '$';
   
   char szGetRequest[MAX_SIZE];
-  char receiveBuffer[MAX_SIZE];
   char szGetResponse[MAX_SIZE];
   
   int connSocket;
-
-  bool bIsFound = false;
 
   struct sockaddr_in sConnAddr;
 
@@ -70,8 +68,6 @@ int main(int argc, char **argv)
 
   memset(szGetRequest, '\0', MAX_SIZE);
   memset(szGetResponse, '\0', MAX_SIZE);
-  memset(receiveBuffer, '\0', MAX_SIZE);
-  bIsFound = false;
 
   structureRequest(szGetRequest, &GOOD_OPERAND, &BAD_OPERATOR, &GOOD_OPERAND);
   
@@ -79,28 +75,10 @@ int main(int argc, char **argv)
 
   send(connSocket, szGetRequest, strlen(szGetRequest), 0);
 
-  if (recv(connSocket, &receiveBuffer, sizeof(szGetResponse), 0) <= 0)
-  {
-    perror("recieve failed!\n");
-    return -1;
-  }
-
-  strncat(szGetResponse, receiveBuffer, (MAX_SIZE - strlen(szGetRequest)) - 1 );
-
-  bIsFound = isEndOf(szGetResponse);
-
-  while (!bIsFound)
-  {
-    memset(receiveBuffer, '\0', sizeof(szGetResponse));
-    recv(connSocket, &receiveBuffer, sizeof(szGetResponse), 0);
-
-    strncat(szGetResponse, receiveBuffer, (MAX_SIZE - strlen(szGetRequest)) - 1 );
-
-    bIsFound = isEndOf(szGetResponse);
-  }
-
-  printf("%s", szGetResponse);
+  recieveMathPacket(connSocket, szGetResponse);
   
+  printf("%s", szGetResponse);
+
   close(connSocket);
 
   printSeperator();
@@ -123,14 +101,22 @@ void structureRequest(char szGetRequest[], const char* operand1,
                       const char* operator, const char* operand2)
 {
   strncat(szGetRequest, "CALCULATE MATH/1.0\nOperand1: ", (MAX_SIZE - strlen(szGetRequest)) - 1 );
-  strncat(szGetRequest, operand1, (MAX_SIZE - strlen(szGetRequest)) - 1 );
+  szGetRequest[strlen(szGetRequest)] = *operand1;
   strncat(szGetRequest, "\nOperator: ", (MAX_SIZE - strlen(szGetRequest)) - 1 );
-  strncat(szGetRequest, operator, (MAX_SIZE - strlen(szGetRequest)) - 1 );
+  szGetRequest[strlen(szGetRequest)] = *operator;
   strncat(szGetRequest, "\nOperand2: ", (MAX_SIZE - strlen(szGetRequest)) - 1 );
-  strncat(szGetRequest, operand2, (MAX_SIZE - strlen(szGetRequest)) - 1 );
+  szGetRequest[strlen(szGetRequest)] = *operand2;
   strncat(szGetRequest, "\nConnection: Close\n\n", (MAX_SIZE - strlen(szGetRequest)) - 1);
 }
-
+/****************************************************************************
+ Function:		  
+ 
+ Description:	  
+ 
+ Parameters:	  
+ 
+ Returned:		  
+****************************************************************************/
 void printSeperator() 
 {
   printf("====\n");
@@ -150,4 +136,39 @@ bool isEndOf(char response[])
   pStr = strstr(response, "\n\n");
 
   return (NULL != pStr);
+}
+/****************************************************************************
+ Function:		  isEndOf
+ 
+ Description:	  determines if the string passed in contains \n\n
+ 
+ Parameters:	  response - the response that is parsed for \n\n characters
+ 
+ Returned:		  true if \n\n is found, else false
+****************************************************************************/
+void recieveMathPacket(int connSocket, char szGetResponse[])
+{
+  char receiveBuffer[MAX_SIZE], response[MAX_SIZE];
+  bool bIsFound = false;
+
+  if (recv(connSocket, &receiveBuffer, MAX_SIZE, 0) <= 0)
+  {
+    perror("recieve failed!\n");
+    return;
+  }
+
+  strncat(response, receiveBuffer, (MAX_SIZE - strlen(response)) - 1 );
+
+  bIsFound = isEndOf(response);
+
+  while (!bIsFound)
+  {
+    memset(receiveBuffer, '\0', MAX_SIZE);
+    recv(connSocket, &receiveBuffer, MAX_SIZE, 0);
+
+    strncat(response, receiveBuffer, (MAX_SIZE - strlen(response)) - 1 );
+
+    bIsFound = isEndOf(response);
+  }
+  memcpy(szGetResponse, response, strlen(response));
 }
