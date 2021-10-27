@@ -29,7 +29,7 @@ void structureRequest(char[], const char*, const char*, const char*);
 void recieveMathPacket(int, char[]);
 void printSeperator();
 bool isEndOf(char[]);
-void structureResponse(char[]);
+void errorTestResponse(char[]);
 void structureBadRequest(char[], const char*, const char*, const char*);
 void structureTimeoutRequest(char[], const char*, const char*, const char*);
 
@@ -71,8 +71,8 @@ int main(int argc, char **argv)
   printSeperator();
   printf("Expected Code: 200\n\n");
 
+  memset(szGetResponse, '\0', MAX_SIZE);
   memset(szGetRequest, '\0', MAX_SIZE);
-  szGetResponse[0] = '\0';
 
   structureRequest(szGetRequest, &GOOD_OPERAND, &BAD_OPERATOR, &GOOD_OPERAND);
   printf("%s\n", szGetRequest);
@@ -80,7 +80,7 @@ int main(int argc, char **argv)
   send(connSocket, szGetRequest, strlen(szGetRequest), 0);
 
   recieveMathPacket(connSocket, szGetResponse);
-  structureResponse(szGetResponse);
+  errorTestResponse(szGetResponse);
   
   printf("%s", szGetResponse);
 
@@ -105,8 +105,8 @@ int main(int argc, char **argv)
   printSeperator();
   printf("Expected Code: 201\n\n");
 
+  memset(szGetResponse, '\0', MAX_SIZE);
   memset(szGetRequest, '\0', MAX_SIZE);
-  szGetResponse[0] = '\0';
 
   structureRequest(szGetRequest, &BAD_OPERAND, &GOOD_OPERATOR, &GOOD_OPERAND);
   printf("%s\n", szGetRequest);
@@ -114,7 +114,7 @@ int main(int argc, char **argv)
   send(connSocket, szGetRequest, strlen(szGetRequest), 0);
 
   recieveMathPacket(connSocket, szGetResponse);
-  structureResponse(szGetResponse);
+  errorTestResponse(szGetResponse);
   
   printf("%s", szGetResponse);
 
@@ -139,8 +139,8 @@ int main(int argc, char **argv)
   printSeperator();
   printf("Expected Code: 202\n\n");
 
+  memset(szGetResponse, '\0', MAX_SIZE);
   memset(szGetRequest, '\0', MAX_SIZE);
-  szGetResponse[0] = '\0';
 
   structureRequest(szGetRequest, &GOOD_OPERAND, &GOOD_OPERATOR, &BAD_OPERAND);
   printf("%s\n", szGetRequest);
@@ -148,7 +148,7 @@ int main(int argc, char **argv)
   send(connSocket, szGetRequest, strlen(szGetRequest), 0);
 
   recieveMathPacket(connSocket, szGetResponse);
-  structureResponse(szGetResponse);
+  errorTestResponse(szGetResponse);
   
   printf("%s", szGetResponse);
 
@@ -173,8 +173,8 @@ int main(int argc, char **argv)
   printSeperator();
   printf("Expected Code: 300\n\n");
 
+  memset(szGetResponse, '\0', MAX_SIZE);
   memset(szGetRequest, '\0', MAX_SIZE);
-  szGetResponse[0] = '\0';
 
   structureBadRequest(szGetRequest, &GOOD_OPERAND, &GOOD_OPERATOR, &GOOD_OPERAND);
   printf("%s\n", szGetRequest);
@@ -182,7 +182,7 @@ int main(int argc, char **argv)
   send(connSocket, szGetRequest, strlen(szGetRequest), 0); 
 
   recieveMathPacket(connSocket, szGetResponse);
-  structureResponse(szGetResponse);
+  errorTestResponse(szGetResponse);
   
   printf("%s", szGetResponse);
 
@@ -207,8 +207,8 @@ int main(int argc, char **argv)
   printSeperator();
   printf("Expected Code: 400\n\n");
 
+  memset(szGetResponse, '\0', MAX_SIZE);
   memset(szGetRequest, '\0', MAX_SIZE);
-  szGetResponse[0] = '\0';
 
   structureTimeoutRequest(szGetRequest, &GOOD_OPERAND, &GOOD_OPERATOR, &GOOD_OPERAND);
   printf("%s\n", szGetRequest);
@@ -216,7 +216,7 @@ int main(int argc, char **argv)
   send(connSocket, szGetRequest, strlen(szGetRequest), 0); 
 
   recieveMathPacket(connSocket, szGetResponse);
-  structureResponse(szGetResponse);
+  errorTestResponse(szGetResponse);
   
   printf("%s", szGetResponse);
 
@@ -252,13 +252,13 @@ void structureRequest(char szGetRequest[], const char* operand1,
   szGetRequest[strlen(szGetRequest)] = '\0';
 }
 /****************************************************************************
- Function:		  
+ Function:		  printSeperator
  
- Description:	  
+ Description:	  prints 4 = signs and a newline to seperate test cases
  
- Parameters:	  
+ Parameters:	  none
  
- Returned:		  
+ Returned:		  none
 ****************************************************************************/
 void printSeperator() 
 {
@@ -281,20 +281,23 @@ bool isEndOf(char response[])
   return (NULL != pStr);
 }
 /****************************************************************************
- Function:		  isEndOf
+ Function:		  receiveMathPacket
  
- Description:	  determines if the string passed in contains \n\n
+ Description:	  receives a  response from the server
  
- Parameters:	  response - the response that is parsed for \n\n characters
+ Parameters:	  connSocket - the socket that is configured to the server
+                szGetResponse - a char array that contains the received
+                                response
  
- Returned:		  true if \n\n is found, else false
+ Returned:		  none
 ****************************************************************************/
 void recieveMathPacket(int connSocket, char szGetResponse[])
 {
-  char receiveBuffer[MAX_SIZE], response[MAX_SIZE];
-  bool bIsFound = false;
+  char receiveBuffer[MAX_SIZE], newResponse[MAX_SIZE]; 
 
-  response[0] = '\0';
+  memset(receiveBuffer, '\0', MAX_SIZE);
+  memset(newResponse, '\0', MAX_SIZE);
+  memset(szGetResponse, '\0', strlen(szGetResponse));
 
   if (recv(connSocket, &receiveBuffer, MAX_SIZE, 0) <= 0)
   {
@@ -302,21 +305,17 @@ void recieveMathPacket(int connSocket, char szGetResponse[])
     return;
   }
 
-  strncat(response, receiveBuffer, (MAX_SIZE - strlen(response)) - 1 );
+  strncat(newResponse, receiveBuffer, (MAX_SIZE - strlen(newResponse) - 1 ));
 
-  bIsFound = isEndOf(response);
-
-  while (!bIsFound)
+  while (!isEndOf(newResponse))
   {
     memset(receiveBuffer, '\0', MAX_SIZE);
     recv(connSocket, &receiveBuffer, MAX_SIZE, 0);
 
-    strncat(response, receiveBuffer, (MAX_SIZE - strlen(response)) - 1 );
-
-    bIsFound = isEndOf(response);
+    strncat(newResponse, receiveBuffer, (MAX_SIZE - strlen(newResponse)) - 1 );
   }
-  memcpy(szGetResponse, response, strlen(response));
-  szGetResponse[strlen(szGetResponse)] = '\0';
+  newResponse[strlen(newResponse)] = '\0';
+  memcpy(szGetResponse, newResponse, strlen(newResponse));
 }
 /****************************************************************************
  Function:		  
@@ -327,7 +326,7 @@ void recieveMathPacket(int connSocket, char szGetResponse[])
  
  Returned:		  
 ****************************************************************************/
-void structureResponse(char response[])
+void errorTestResponse(char response[])
 {
   const int OK_CODE = 100;
   char* pStr = NULL;

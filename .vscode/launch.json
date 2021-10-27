@@ -9,8 +9,8 @@
       "name": "(gdb) Launch Client with args", // Change name
       "type": "cppdbg",
       "request": "launch",
-      "program": "${workspaceFolder}/bin/mathPacket_client", // THIS IS IMPORTANT
-      "args": ["127.0.0.1", "8080", "1", "+", "2"], // add comma separated list of args here.
+      "program": "${workspaceFolder}/bin/mathPacket_errors", // THIS IS IMPORTANT
+      "args": ["127.0.0.1", "8080"], // add comma separated list of args here.
       "stopAtEntry":  true, // THIS IS IMPORTANT 
       "cwd": "${fileDirname}",
       "environment": [],
