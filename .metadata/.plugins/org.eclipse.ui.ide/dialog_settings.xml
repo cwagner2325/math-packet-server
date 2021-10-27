@@ -10,4 +10,12 @@
 			<item value="/home/wagn2541/git/math-packet-cwagner2325_"/>
 		</list>
 	</section>
+	<section name="ChooseWorkspaceDialogSettings">
+		<item key="DIALOG_X_ORIGIN" value="1370"/>
+		<item key="DIALOG_Y_ORIGIN" value="593"/>
+	</section>
+	<section name="WORKBENCH_SETTINGS">
+		<list key="ENABLED_TRANSFERS">
+		</list>
+	</section>
 </section>

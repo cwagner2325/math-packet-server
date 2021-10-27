@@ -124,15 +124,18 @@ bool isEndOf(char response[])
  
  Returned:		  none
 ****************************************************************************/
-void structureRequest(char szGetRequest[], char* operand1, char* operator, char* operand2)
+void structureRequest(char szGetRequest[], char* operand1, char* operator,
+                      char* operand2)
 {
-  strncat(szGetRequest, "CALCULATE MATH/1.0\nOperand1: ", (MAX_SIZE - strlen(szGetRequest)) - 1 );
+  strncat(szGetRequest, "CALCULATE MATH/1.0\nOperand1: ", 
+         (MAX_SIZE - strlen(szGetRequest)) - 1 );
   strncat(szGetRequest, operand1, (MAX_SIZE - strlen(szGetRequest)) - 1 );
   strncat(szGetRequest, "\nOperator: ", (MAX_SIZE - strlen(szGetRequest)) - 1 );
   strncat(szGetRequest, operator, (MAX_SIZE - strlen(szGetRequest)) - 1 );
   strncat(szGetRequest, "\nOperand2: ", (MAX_SIZE - strlen(szGetRequest)) - 1 );
   strncat(szGetRequest, operand2, (MAX_SIZE - strlen(szGetRequest)) - 1 );
-  strncat(szGetRequest, "\nConnection: Close\n\n", (MAX_SIZE - strlen(szGetRequest)) - 1);
+  strncat(szGetRequest, "\nConnection: Close\n\n", 
+         (MAX_SIZE - strlen(szGetRequest)) - 1);
 }
 /****************************************************************************
  Function:		  formatXstrings
@@ -269,16 +272,19 @@ void formatStrings(char response[])
     }
     else
     {
-      strncat(newResponse, "No Rounding\n", (MAX_SIZE - strlen(newResponse)) - 1 );
+      strncat(newResponse, "No Rounding\n", (MAX_SIZE - strlen(newResponse))
+              - 1 );
     }
 
     if (checkHeader(response, "Overflow"))
     {
-      strncat(newResponse, "Overflow!\n", (MAX_SIZE - strlen(newResponse)) - 1 );
+      strncat(newResponse, "Overflow!\n", (MAX_SIZE - strlen(newResponse)) 
+              - 1 );
     }
     else
     {
-      strncat(newResponse, "No Overflow\n", (MAX_SIZE - strlen(newResponse)) - 1 );
+      strncat(newResponse, "No Overflow\n", (MAX_SIZE - strlen(newResponse)) 
+              - 1 );
     }
 
     strncat(newResponse, pEnd, (MAX_SIZE - strlen(newResponse)) - 1 );
@@ -360,9 +366,11 @@ void errorTestResponse(char response[])
 
   if (OK_CODE != atoi(pStr))
   {
-    strncat(newResponse, "Response Code:", (MAX_SIZE - strlen(newResponse)) - 1 );
+    strncat(newResponse, "Response Code:", (MAX_SIZE - strlen(newResponse)) 
+            - 1 );
     strncat(newResponse, pStr, (MAX_SIZE - strlen(newResponse)) - 1 );
-    strncat(newResponse, "\nResponse Message:", (MAX_SIZE - strlen(newResponse)) - 1 );
+    strncat(newResponse, "\nResponse Message:", (MAX_SIZE - strlen(newResponse)) 
+            - 1 );
 
     *pEnd = ' ';
 

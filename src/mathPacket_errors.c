@@ -176,7 +176,8 @@ int main(int argc, char **argv)
   memset(szGetResponse, '\0', MAX_SIZE);
   memset(szGetRequest, '\0', MAX_SIZE);
 
-  structureBadRequest(szGetRequest, &GOOD_OPERAND, &GOOD_OPERATOR, &GOOD_OPERAND);
+  structureBadRequest(szGetRequest, &GOOD_OPERAND, &GOOD_OPERATOR, 
+                      &GOOD_OPERAND);
   printf("%s\n", szGetRequest);
 
   send(connSocket, szGetRequest, strlen(szGetRequest), 0); 
@@ -210,7 +211,8 @@ int main(int argc, char **argv)
   memset(szGetResponse, '\0', MAX_SIZE);
   memset(szGetRequest, '\0', MAX_SIZE);
 
-  structureTimeoutRequest(szGetRequest, &GOOD_OPERAND, &GOOD_OPERATOR, &GOOD_OPERAND);
+  structureTimeoutRequest(szGetRequest, &GOOD_OPERAND, &GOOD_OPERATOR, 
+                          &GOOD_OPERAND);
   printf("%s\n", szGetRequest);
 
   send(connSocket, szGetRequest, strlen(szGetRequest), 0); 
@@ -242,13 +244,15 @@ void structureRequest(char szGetRequest[], const char* operand1,
                       const char* operator, const char* operand2)
 {
 
-  strncat(szGetRequest, "CALCULATE MATH/1.0\nOperand1: ", (MAX_SIZE - strlen(szGetRequest)) - 1 );
+  strncat(szGetRequest, "CALCULATE MATH/1.0\nOperand1: ", 
+         (MAX_SIZE - strlen(szGetRequest)) - 1 );
   szGetRequest[strlen(szGetRequest)] = *operand1;
   strncat(szGetRequest, "\nOperator: ", (MAX_SIZE - strlen(szGetRequest)) - 1 );
   szGetRequest[strlen(szGetRequest)] = *operator;
   strncat(szGetRequest, "\nOperand2: ", (MAX_SIZE - strlen(szGetRequest)) - 1 );
   szGetRequest[strlen(szGetRequest)] = *operand2;
-  strncat(szGetRequest, "\nConnection: Close\n\n", (MAX_SIZE - strlen(szGetRequest)) - 1);
+  strncat(szGetRequest, "\nConnection: Close\n\n", 
+         (MAX_SIZE - strlen(szGetRequest)) - 1);
   szGetRequest[strlen(szGetRequest)] = '\0';
 }
 /****************************************************************************
@@ -356,9 +360,11 @@ void errorTestResponse(char response[])
 
   if (OK_CODE != atoi(pStr))
   {
-    strncat(newResponse, "Response Code:", (MAX_SIZE - strlen(newResponse)) - 1 );
+    strncat(newResponse, "Response Code:", 
+           (MAX_SIZE - strlen(newResponse)) - 1 );
     strncat(newResponse, pStr, (MAX_SIZE - strlen(newResponse)) - 1 );
-    strncat(newResponse, "\nResponse Message:", (MAX_SIZE - strlen(newResponse)) - 1 );
+    strncat(newResponse, "\nResponse Message:", 
+           (MAX_SIZE - strlen(newResponse)) - 1 );
 
     *pEnd = ' ';
 
@@ -393,13 +399,15 @@ void errorTestResponse(char response[])
 void structureTimeoutRequest(char szGetRequest[], const char* operand1, 
                       const char* operator, const char* operand2)
 {
-  strncat(szGetRequest, "CALCULATE MATH/1.0\nOperand1: ", (MAX_SIZE - strlen(szGetRequest)) - 1 );
+  strncat(szGetRequest, "CALCULATE MATH/1.0\nOperand1: ", 
+         (MAX_SIZE - strlen(szGetRequest)) - 1 );
   szGetRequest[strlen(szGetRequest)] = *operand1;
   strncat(szGetRequest, "\nOperator: ", (MAX_SIZE - strlen(szGetRequest)) - 1 );
   szGetRequest[strlen(szGetRequest)] = *operator;
   strncat(szGetRequest, "\nOperand2: ", (MAX_SIZE - strlen(szGetRequest)) - 1 );
   szGetRequest[strlen(szGetRequest)] = *operand2;
-  strncat(szGetRequest, "\nConnection: Close\n", (MAX_SIZE - strlen(szGetRequest)) - 1);
+  strncat(szGetRequest, "\nConnection: Close\n", 
+         (MAX_SIZE - strlen(szGetRequest)) - 1);
 }
 /****************************************************************************
  Function:		  structureBadRequest
@@ -416,11 +424,13 @@ void structureTimeoutRequest(char szGetRequest[], const char* operand1,
 void structureBadRequest(char szGetRequest[], const char* operand1, 
                       const char* operator, const char* operand2)
 {
-  strncat(szGetRequest, "CALCULATE MATH/1.0\nOperand1: ", (MAX_SIZE - strlen(szGetRequest)) - 1 );
+  strncat(szGetRequest, "CALCULATE MATH/1.0\nOperand1: ", 
+         (MAX_SIZE - strlen(szGetRequest)) - 1 );
   szGetRequest[strlen(szGetRequest)] = *operand1;
   strncat(szGetRequest, "\nOperator: ", (MAX_SIZE - strlen(szGetRequest)) - 1 );
   szGetRequest[strlen(szGetRequest)] = *operator;
   strncat(szGetRequest, "\nOpera: ", (MAX_SIZE - strlen(szGetRequest)) - 1 );
   szGetRequest[strlen(szGetRequest)] = *operand2;
-  strncat(szGetRequest, "\nConnection: Close\n\n", (MAX_SIZE - strlen(szGetRequest)) - 1);
+  strncat(szGetRequest, "\nConnection: Close\n\n", 
+         (MAX_SIZE - strlen(szGetRequest)) - 1);
 }
