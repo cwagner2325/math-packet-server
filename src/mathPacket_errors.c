@@ -318,13 +318,15 @@ void recieveMathPacket(int connSocket, char szGetResponse[])
   memcpy(szGetResponse, newResponse, strlen(newResponse));
 }
 /****************************************************************************
- Function:		  
+ Function:		  errorTestResponse
  
- Description:	  
+ Description:	  Verifies the response's error code, if it is not 100 OK, then
+                the response is formatted into the appropriate error coe
  
- Parameters:	  
+ Parameters:	  respose - an array of chars that is verified and reformatted
+                          if necessary
  
- Returned:		  
+ Returned:		  none
 ****************************************************************************/
 void errorTestResponse(char response[])
 {
@@ -377,7 +379,7 @@ void errorTestResponse(char response[])
   }
 }
 /****************************************************************************
- Function:		  structureBadRequest
+ Function:		  structureTimeoutRequest
  
  Description:	  Structures a server request in the incorrect format
  
