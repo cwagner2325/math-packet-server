@@ -30,6 +30,8 @@ void structureRequest(char[], char*, char*, char*);
 void formatXstrings(char[]);
 bool checkHeader(char response[], char header[]);
 void formatStrings(char[]);
+void receiveMathPacket(int connSocket, char szGetResponse[]);
+void errorTestResponse(char[]);
 
 /****************************************************************************
  Function:		main
@@ -47,18 +49,14 @@ int main(int argc, char **argv)
   const int MAX_SIZE = 1024;
 
   char szGetRequest[MAX_SIZE];
-  char receiveBuffer[MAX_SIZE];
   char szGetResponse[MAX_SIZE];
   
   int connSocket;
 
-  bool bIsFound = false;
-
   struct sockaddr_in sConnAddr;
 
-  szGetRequest[0] = '\0';
-  szGetResponse[0] = '\0';
-  receiveBuffer[0] = '\0';
+  memset(szGetRequest, '\0', MAX_SIZE);
+  memset(szGetResponse, '\0', MAX_SIZE);
 
   structureRequest(szGetRequest, argv[3], argv[4], argv[5]);
 
@@ -75,31 +73,22 @@ int main(int argc, char **argv)
   
   connect(connSocket, (struct sockaddr *) &sConnAddr, sizeof(sConnAddr));
   
-  printf(">|%s<|\n\n", szGetRequest);
+  if(argc > 6)
+  {
+    if(strcmp(argv[6], "-d") == 0)
+    {
+      printf("%s\n", szGetRequest);
+    }
+  }
+  
 
   send(connSocket, szGetRequest, strlen(szGetRequest), 0);
 
-  if (recv(connSocket, &receiveBuffer, sizeof(szGetResponse), 0) <= 0)
-  {
-    perror("recieve failed!\n");
-    return -1;
-  }
-
-  strncat(szGetResponse, receiveBuffer, (MAX_SIZE - strlen(szGetRequest)) - 1 );
-
-  bIsFound = isEndOf(szGetResponse);
-
-  while (!bIsFound)
-  {
-    memset(receiveBuffer, '\0', sizeof(szGetResponse));
-    recv(connSocket, &receiveBuffer, sizeof(szGetResponse), 0);
-
-    strncat(szGetResponse, receiveBuffer, (MAX_SIZE - strlen(szGetRequest)) - 1 );
-
-    bIsFound = isEndOf(szGetResponse);
-  }
+  receiveMathPacket(connSocket, szGetResponse);
 
   formatXstrings(szGetResponse);
+  formatStrings(szGetResponse);
+  errorTestResponse(szGetResponse);
 
   printf("%s", szGetResponse);
   
@@ -186,14 +175,15 @@ void formatXstrings(char response[])
   strncat(temp, tempX, (MAX_SIZE - strlen(temp)) - 1 );
 
   memset(response, '\0', MAX_SIZE);
-  strncat(response, temp, (MAX_SIZE - strlen(response)) - 1 );
+  memcpy(response, temp, MAX_SIZE);
 }
 /****************************************************************************
- Function:		  
+ Function:		  checkHeader
  
- Description:	  
+ Description:	  checks if the contents of a header is true or false
  
- Parameters:	  response - 
+ Parameters:	  response - the response that is verified
+                header   - the header that is evaluated as true or false
  
  Returned:		  none
 ****************************************************************************/
@@ -211,34 +201,35 @@ bool checkHeader(char response[], char header[])
     {
       pEnd++;
     }
-  }
 
-  *pEnd = '\0';
+    *pEnd = '\0';
 
-  pIsFound = strstr(pStr, "True");
- 
-  if (NULL != pIsFound)
-  {
-    bStatus = true;
-  }
-  else 
-  {
-    pIsFound = strstr(pStr, "False");
-    
+    pIsFound = strstr(pStr, "True");
+  
     if (NULL != pIsFound)
     {
-    bStatus = false;
+      bStatus = true;
     }
-  }
+    else 
+    {
+      pIsFound = strstr(pStr, "False");
+      
+      if (NULL != pIsFound)
+      {
+      bStatus = false;
+      }
+    }
 
-  *pEnd = NEW_LINE;
+    *pEnd = NEW_LINE;
+  }
 
   return bStatus;
 }
 /****************************************************************************
  Function:		  formatStrings
  
- Description:	  
+ Description:	  Formtas the Rounding and Overflow fields into the correct 
+                formats
  
  Parameters:	  response - the server response that is formatted
  
@@ -246,6 +237,152 @@ bool checkHeader(char response[], char header[])
 ****************************************************************************/
 void formatStrings(char response[])
 {
-  checkHeader(response, "Rounding");
-  checkHeader(response, "Overflow");
+  char newResponse[MAX_SIZE];
+  char* pStr, *pEnd , tempChar;
+
+  memset(newResponse, '\0', MAX_SIZE);
+
+  pStr = &response[0];
+  pEnd = strstr(response, "Rounding");
+
+  if (NULL != pEnd)
+  {
+    tempChar = *pEnd;
+    *pEnd = '\0';
+    strncat(newResponse, pStr, (MAX_SIZE - strlen(newResponse)) - 1 );
+    *pEnd = tempChar;
+
+    while('\n' != *pEnd)
+    {
+      pEnd++;
+    }
+
+    while('\n' != *pEnd)
+    {
+      pEnd++;
+    }
+    pEnd++;
+    
+    if (checkHeader(response, "Rounding"))
+    {
+      strncat(newResponse, "Rounded!\n", (MAX_SIZE - strlen(newResponse)) - 1 );
+    }
+    else
+    {
+      strncat(newResponse, "No Rounding\n", (MAX_SIZE - strlen(newResponse)) - 1 );
+    }
+
+    if (checkHeader(response, "Overflow"))
+    {
+      strncat(newResponse, "Overflow!\n", (MAX_SIZE - strlen(newResponse)) - 1 );
+    }
+    else
+    {
+      strncat(newResponse, "No Overflow\n", (MAX_SIZE - strlen(newResponse)) - 1 );
+    }
+
+    strncat(newResponse, pEnd, (MAX_SIZE - strlen(newResponse)) - 1 );
+  }
+}
+/****************************************************************************
+ Function:		  receiveMathPacket
+ 
+ Description:	  receives a  response from the server
+ 
+ Parameters:	  connSocket - the socket that is configured to the server
+                szGetResponse - a char array that contains the received
+                                response
+ 
+ Returned:		  none
+****************************************************************************/
+void receiveMathPacket(int connSocket, char szGetResponse[])
+{
+  char receiveBuffer[MAX_SIZE], newResponse[MAX_SIZE]; 
+
+  memset(receiveBuffer, '\0', MAX_SIZE);
+  memset(newResponse, '\0', MAX_SIZE);
+  memset(szGetResponse, '\0', strlen(szGetResponse));
+
+  if (recv(connSocket, &receiveBuffer, MAX_SIZE, 0) <= 0)
+  {
+    perror("recieve failed!\n");
+    return;
+  }
+
+  strncat(newResponse, receiveBuffer, (MAX_SIZE - strlen(newResponse) - 1 ));
+
+  while (!isEndOf(newResponse))
+  {
+    memset(receiveBuffer, '\0', MAX_SIZE);
+    recv(connSocket, &receiveBuffer, MAX_SIZE, 0);
+
+    strncat(newResponse, receiveBuffer, (MAX_SIZE - strlen(newResponse)) - 1 );
+  }
+  newResponse[strlen(newResponse)] = '\0';
+  memcpy(szGetResponse, newResponse, strlen(newResponse));
+}
+/****************************************************************************
+ Function:		  errorTestResponse
+ 
+ Description:	  Verifies the response's error code, if it is not 100 OK, then
+                the response is formatted into the appropriate error coe
+ 
+ Parameters:	  respose - an array of chars that is verified and reformatted
+                          if necessary
+ 
+ Returned:		  none
+****************************************************************************/
+void errorTestResponse(char response[])
+{
+  const int OK_CODE = 100;
+  char* pStr = NULL;
+  char* pEnd = NULL;
+  char newResponse[MAX_SIZE];
+
+  memset(newResponse, '\0', MAX_SIZE);
+
+  pStr = strstr(response, "MATH");
+
+  while(!isspace(*pStr))
+  {
+    pStr++;
+  }
+
+  pEnd = pStr;
+  pEnd++;
+
+  while(!isspace(*pEnd))
+  {
+    pEnd++;
+  }
+
+  *pEnd = '\0';
+
+  if (OK_CODE != atoi(pStr))
+  {
+    strncat(newResponse, "Response Code:", (MAX_SIZE - strlen(newResponse)) - 1 );
+    strncat(newResponse, pStr, (MAX_SIZE - strlen(newResponse)) - 1 );
+    strncat(newResponse, "\nResponse Message:", (MAX_SIZE - strlen(newResponse)) - 1 );
+
+    *pEnd = ' ';
+
+    pStr = pEnd;
+
+    while('\n' != *pEnd)
+    {
+      pEnd++;
+    }
+
+    *pEnd = '\0';
+    strncat(newResponse, pStr, (MAX_SIZE - strlen(newResponse)) - 1 );
+    newResponse[strlen(newResponse)] = '\n';
+
+    memset(response, '\0', MAX_SIZE);
+    memcpy(response, newResponse, strlen(newResponse));
+    response[strlen(response)] = '\0';
+  }
+  else
+  {
+    *pEnd = ' ';
+  }
 }

@@ -26,7 +26,7 @@ const char NEW_LINE = '\n';
 const int MAX_SIZE = 1024;
 
 void structureRequest(char[], const char*, const char*, const char*);
-void recieveMathPacket(int, char[]);
+void receiveMathPacket(int, char[]);
 void printSeperator();
 bool isEndOf(char[]);
 void errorTestResponse(char[]);
@@ -79,7 +79,7 @@ int main(int argc, char **argv)
 
   send(connSocket, szGetRequest, strlen(szGetRequest), 0);
 
-  recieveMathPacket(connSocket, szGetResponse);
+  receiveMathPacket(connSocket, szGetResponse);
   errorTestResponse(szGetResponse);
   
   printf("%s", szGetResponse);
@@ -113,7 +113,7 @@ int main(int argc, char **argv)
 
   send(connSocket, szGetRequest, strlen(szGetRequest), 0);
 
-  recieveMathPacket(connSocket, szGetResponse);
+  receiveMathPacket(connSocket, szGetResponse);
   errorTestResponse(szGetResponse);
   
   printf("%s", szGetResponse);
@@ -147,7 +147,7 @@ int main(int argc, char **argv)
 
   send(connSocket, szGetRequest, strlen(szGetRequest), 0);
 
-  recieveMathPacket(connSocket, szGetResponse);
+  receiveMathPacket(connSocket, szGetResponse);
   errorTestResponse(szGetResponse);
   
   printf("%s", szGetResponse);
@@ -181,7 +181,7 @@ int main(int argc, char **argv)
 
   send(connSocket, szGetRequest, strlen(szGetRequest), 0); 
 
-  recieveMathPacket(connSocket, szGetResponse);
+  receiveMathPacket(connSocket, szGetResponse);
   errorTestResponse(szGetResponse);
   
   printf("%s", szGetResponse);
@@ -215,7 +215,7 @@ int main(int argc, char **argv)
 
   send(connSocket, szGetRequest, strlen(szGetRequest), 0); 
 
-  recieveMathPacket(connSocket, szGetResponse);
+  receiveMathPacket(connSocket, szGetResponse);
   errorTestResponse(szGetResponse);
   
   printf("%s", szGetResponse);
@@ -291,7 +291,7 @@ bool isEndOf(char response[])
  
  Returned:		  none
 ****************************************************************************/
-void recieveMathPacket(int connSocket, char szGetResponse[])
+void receiveMathPacket(int connSocket, char szGetResponse[])
 {
   char receiveBuffer[MAX_SIZE], newResponse[MAX_SIZE]; 
 
