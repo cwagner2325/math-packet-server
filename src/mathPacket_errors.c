@@ -22,6 +22,7 @@
 #include <ctype.h>
 #include <stdbool.h>
 
+const char NEW_LINE = '\n';
 const int MAX_SIZE = 1024;
 
 void structureRequest(char[], const char*, const char*, const char*);
@@ -71,7 +72,7 @@ int main(int argc, char **argv)
   printf("Expected Code: 200\n\n");
 
   memset(szGetRequest, '\0', MAX_SIZE);
-  memset(szGetResponse, '\0', MAX_SIZE);
+  szGetResponse[0] = '\0';
 
   structureRequest(szGetRequest, &GOOD_OPERAND, &BAD_OPERATOR, &GOOD_OPERAND);
   printf("%s\n", szGetRequest);
@@ -105,7 +106,7 @@ int main(int argc, char **argv)
   printf("Expected Code: 201\n\n");
 
   memset(szGetRequest, '\0', MAX_SIZE);
-  memset(szGetResponse, '\0', MAX_SIZE);
+  szGetResponse[0] = '\0';
 
   structureRequest(szGetRequest, &BAD_OPERAND, &GOOD_OPERATOR, &GOOD_OPERAND);
   printf("%s\n", szGetRequest);
@@ -139,7 +140,7 @@ int main(int argc, char **argv)
   printf("Expected Code: 202\n\n");
 
   memset(szGetRequest, '\0', MAX_SIZE);
-  memset(szGetResponse, '\0', MAX_SIZE);
+  szGetResponse[0] = '\0';
 
   structureRequest(szGetRequest, &GOOD_OPERAND, &GOOD_OPERATOR, &BAD_OPERAND);
   printf("%s\n", szGetRequest);
@@ -173,7 +174,7 @@ int main(int argc, char **argv)
   printf("Expected Code: 300\n\n");
 
   memset(szGetRequest, '\0', MAX_SIZE);
-  memset(szGetResponse, '\0', MAX_SIZE);
+  szGetResponse[0] = '\0';
 
   structureBadRequest(szGetRequest, &GOOD_OPERAND, &GOOD_OPERATOR, &GOOD_OPERAND);
   printf("%s\n", szGetRequest);
@@ -207,7 +208,7 @@ int main(int argc, char **argv)
   printf("Expected Code: 400\n\n");
 
   memset(szGetRequest, '\0', MAX_SIZE);
-  memset(szGetResponse, '\0', MAX_SIZE);
+  szGetResponse[0] = '\0';
 
   structureTimeoutRequest(szGetRequest, &GOOD_OPERAND, &GOOD_OPERATOR, &GOOD_OPERAND);
   printf("%s\n", szGetRequest);
@@ -240,6 +241,7 @@ int main(int argc, char **argv)
 void structureRequest(char szGetRequest[], const char* operand1, 
                       const char* operator, const char* operand2)
 {
+
   strncat(szGetRequest, "CALCULATE MATH/1.0\nOperand1: ", (MAX_SIZE - strlen(szGetRequest)) - 1 );
   szGetRequest[strlen(szGetRequest)] = *operand1;
   strncat(szGetRequest, "\nOperator: ", (MAX_SIZE - strlen(szGetRequest)) - 1 );
@@ -247,6 +249,7 @@ void structureRequest(char szGetRequest[], const char* operand1,
   strncat(szGetRequest, "\nOperand2: ", (MAX_SIZE - strlen(szGetRequest)) - 1 );
   szGetRequest[strlen(szGetRequest)] = *operand2;
   strncat(szGetRequest, "\nConnection: Close\n\n", (MAX_SIZE - strlen(szGetRequest)) - 1);
+  szGetRequest[strlen(szGetRequest)] = '\0';
 }
 /****************************************************************************
  Function:		  
@@ -313,6 +316,7 @@ void recieveMathPacket(int connSocket, char szGetResponse[])
     bIsFound = isEndOf(response);
   }
   memcpy(szGetResponse, response, strlen(response));
+  szGetResponse[strlen(szGetResponse)] = '\0';
 }
 /****************************************************************************
  Function:		  
@@ -325,15 +329,14 @@ void recieveMathPacket(int connSocket, char szGetResponse[])
 ****************************************************************************/
 void structureResponse(char response[])
 {
-  const int TIMEOUT_CODE = 400, OK_CODE = 100;
+  const int OK_CODE = 100;
   char* pStr = NULL;
   char* pEnd = NULL;
   char newResponse[MAX_SIZE];
-  
-  newResponse[0] = '\0';
+
   memset(newResponse, '\0', MAX_SIZE);
 
-  pStr = strstr(response, "MATH/");
+  pStr = strstr(response, "MATH");
 
   while(!isspace(*pStr))
   {
@@ -358,27 +361,20 @@ void structureResponse(char response[])
 
     *pEnd = ' ';
 
-    if (TIMEOUT_CODE == atoi(pStr))
-    {
-      strncat(newResponse, " Timeout\n", (MAX_SIZE - strlen(newResponse)) - 1 );
-    }
-    else
-    {
-      pStr = pEnd;
+    pStr = pEnd;
 
-      while('\n' != *pEnd)
-      {
-        pEnd++;
-      }
-
-      *pEnd = '\0';
-      strncat(newResponse, pStr, (MAX_SIZE - strlen(newResponse)) - 1 );
-      newResponse[strlen(newResponse)] = '\n';
-      *pEnd = '\n';
+    while('\n' != *pEnd)
+    {
+      pEnd++;
     }
 
-    response[0] = '\0';
-    memcpy(response, newResponse, MAX_SIZE);
+    *pEnd = '\0';
+    strncat(newResponse, pStr, (MAX_SIZE - strlen(newResponse)) - 1 );
+    newResponse[strlen(newResponse)] = '\n';
+
+    memset(response, '\0', MAX_SIZE);
+    memcpy(response, newResponse, strlen(newResponse));
+    response[strlen(response)] = '\0';
   }
 }
 /****************************************************************************
