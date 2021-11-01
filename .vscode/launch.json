@@ -10,7 +10,7 @@
       "type": "cppdbg",
       "request": "launch",
       "program": "${workspaceFolder}/bin/mathPacket_client", // THIS IS IMPORTANT
-      "args": ["127.0.0.1", "8080", "0m", "/", "2", "-d"], // add comma separated list of args here.
+      "args": ["127.0.0.1", "8080", "1", "/", "2", "+", "1", "-d"], // add comma separated list of args here.
       "stopAtEntry":  true, // THIS IS IMPORTANT 
       "cwd": "${fileDirname}",
       "environment": [],

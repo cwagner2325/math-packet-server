@@ -26,12 +26,17 @@ const int MAX_SIZE = 1024;
 const char NEW_LINE = '\n';
 
 bool isEndOf(char[]);
-void structureRequest(char[], char*, char*, char*);
+int checkErrorCode(char[]);
+bool checkHeader(char[], char[]);
+
 void formatXstrings(char[]);
-bool checkHeader(char response[], char header[]);
 void formatStrings(char[]);
-void receiveMathPacket(int connSocket, char szGetResponse[]);
+void receiveMathPacket(int, char[]);
 void errorTestResponse(char[]);
+
+void structureVersion1Packet(char[], char*, char* , char*);
+void structureFirstRequest(char[], char*, char*, char*);
+void structureContinuePacket(char[], char*, char*, bool);
 
 /****************************************************************************
  Function:		main
@@ -46,19 +51,19 @@ void errorTestResponse(char[]);
 ****************************************************************************/
 int main(int argc, char **argv)
 {
-  const int MAX_SIZE = 1024;
+  const int MAX_SIZE = 1024, OK_CODE = 100;
+  const int  VERSION_1_SIZE[2] = { 6, 7 };
 
   char szGetRequest[MAX_SIZE];
   char szGetResponse[MAX_SIZE];
   
-  int connSocket;
+  int connSocket, errorCode;
+  bool bIsDisplay = false, bIsLastPacket;
 
   struct sockaddr_in sConnAddr;
 
   memset(szGetRequest, '\0', MAX_SIZE);
   memset(szGetResponse, '\0', MAX_SIZE);
-
-  structureRequest(szGetRequest, argv[3], argv[4], argv[5]);
 
   connSocket = socket(AF_INET, SOCK_STREAM, 0);
   sConnAddr.sin_family = AF_INET;
@@ -72,19 +77,42 @@ int main(int argc, char **argv)
   }
   
   connect(connSocket, (struct sockaddr *) &sConnAddr, sizeof(sConnAddr));
-  
-  if(argc > 6)
+
+  if (VERSION_1_SIZE[0] == argc || VERSION_1_SIZE[1] == argc)
   {
-    if(strcmp(argv[6], "-d") == 0)
+    structureVersion1Packet(szGetRequest, argv[3], argv[4], argv[5]);
+  }
+  else
+  {
+    structureFirstRequest(szGetRequest, argv[3], argv[4], argv[5]);
+  }
+  
+  if (strcmp(argv[argc - 1], "-d") == 0)
+  {
+    printf("%s\n", szGetRequest);
+    bIsDisplay = true;
+  }
+  
+  send(connSocket, szGetRequest, strlen(szGetRequest), 0);
+  receiveMathPacket(connSocket, szGetResponse);
+  errorCode = checkErrorCode(szGetResponse);
+
+  for (int i = 6; i < argc - 1 && OK_CODE == errorCode; i += 2)
+  {
+    memset(szGetRequest, '\0', sizeof(szGetRequest));
+    bIsLastPacket = (i < argc -3);
+
+    structureContinuePacket(szGetRequest, argv[i], argv[i+1], bIsLastPacket);
+
+    if (bIsDisplay) 
     {
       printf("%s\n", szGetRequest);
     }
+
+    send(connSocket, szGetRequest, strlen(szGetRequest), 0);
+    receiveMathPacket(connSocket, szGetResponse);
+    errorCode = checkErrorCode(szGetResponse);
   }
-  
-
-  send(connSocket, szGetRequest, strlen(szGetRequest), 0);
-
-  receiveMathPacket(connSocket, szGetResponse);
 
   formatXstrings(szGetResponse);
   formatStrings(szGetResponse);
@@ -124,17 +152,18 @@ bool isEndOf(char response[])
  
  Returned:		  none
 ****************************************************************************/
-void structureRequest(char szGetRequest[], char* operand1, char* operator,
+void structureFirstRequest(char szGetRequest[], char* operand1, char* operator,
                       char* operand2)
 {
-  strncat(szGetRequest, "CALCULATE MATH/1.0\nOperand1: ", 
+
+  strncat(szGetRequest, "CALCULATE MATH/1.1\nOperand1: ", 
          (MAX_SIZE - strlen(szGetRequest)) - 1 );
   strncat(szGetRequest, operand1, (MAX_SIZE - strlen(szGetRequest)) - 1 );
   strncat(szGetRequest, "\nOperator: ", (MAX_SIZE - strlen(szGetRequest)) - 1 );
   strncat(szGetRequest, operator, (MAX_SIZE - strlen(szGetRequest)) - 1 );
   strncat(szGetRequest, "\nOperand2: ", (MAX_SIZE - strlen(szGetRequest)) - 1 );
   strncat(szGetRequest, operand2, (MAX_SIZE - strlen(szGetRequest)) - 1 );
-  strncat(szGetRequest, "\nConnection: Close\n\n", 
+  strncat(szGetRequest, "\nConnection: Keep-Alive\n\n", 
          (MAX_SIZE - strlen(szGetRequest)) - 1);
 }
 /****************************************************************************
@@ -392,5 +421,96 @@ void errorTestResponse(char response[])
   else
   {
     *pEnd = ' ';
+  }
+}
+/****************************************************************************
+ Function:		  checkErrorCode
+ 
+ Description:	  
+ 
+ Parameters:	  respose - 
+ 
+ Returned:		  none
+****************************************************************************/
+int checkErrorCode(char response[])
+{
+  char* pStr = NULL;
+  char* pEnd = NULL;
+  char tempChar;
+  int errorCode;
+
+  pStr = strstr(response, "MATH");
+
+  while(!isspace(*pStr))
+  {
+    pStr++;
+  }
+
+  pEnd = pStr;
+  pEnd++;
+
+  while(!isspace(*pEnd))
+  {
+    pEnd++;
+  }
+
+  tempChar = *pEnd;
+  *pEnd = '\0';
+  errorCode = atoi(pStr);
+  *pEnd = tempChar;
+
+  return errorCode;
+}
+/****************************************************************************
+ Function:		  structureContinuePacket
+ 
+ Description:	  
+ 
+ Parameters:	  respose - 
+ 
+ Returned:		  none
+****************************************************************************/
+void structureVersion1Packet(char szGetRequest[], char* operand1, 
+                             char* operator, char* operand2)
+{
+  strncat(szGetRequest, "CALCULATE MATH/1.0\n", 
+         (MAX_SIZE - strlen(szGetRequest)) - 1 );
+  strncat(szGetRequest, "Operand1: ", (MAX_SIZE - strlen(szGetRequest)) - 1 );
+  strncat(szGetRequest, operand1, (MAX_SIZE - strlen(szGetRequest)) - 1 );
+  strncat(szGetRequest, "\nOperator: ", (MAX_SIZE - strlen(szGetRequest)) - 1 );
+  strncat(szGetRequest, operator, (MAX_SIZE - strlen(szGetRequest)) - 1 );
+  strncat(szGetRequest, "\nOperand2: ", (MAX_SIZE - strlen(szGetRequest)) - 1 );
+  strncat(szGetRequest, operand2, (MAX_SIZE - strlen(szGetRequest)) - 1 );
+  strncat(szGetRequest, "\nConnection: Close\n\n", 
+         (MAX_SIZE - strlen(szGetRequest)) - 1);
+}
+/****************************************************************************
+ Function:		  structureContinuePacket
+ 
+ Description:	  
+ 
+ Parameters:	  respose - 
+ 
+ Returned:		  none
+****************************************************************************/
+void structureContinuePacket(char szGetRequest[], char* operator, 
+                             char* operand2, bool bIsContinue)
+{
+  strncat(szGetRequest, "CONTINUE MATH/1.1\n", 
+         (MAX_SIZE - strlen(szGetRequest)) - 1 );
+  strncat(szGetRequest, "Operator: ", (MAX_SIZE - strlen(szGetRequest)) - 1 );
+  strncat(szGetRequest, operator, (MAX_SIZE - strlen(szGetRequest)) - 1 );
+  strncat(szGetRequest, "\nOperand2: ", (MAX_SIZE - strlen(szGetRequest)) - 1 );
+  strncat(szGetRequest, operand2, (MAX_SIZE - strlen(szGetRequest)) - 1 );
+  
+  if(bIsContinue)
+  {
+    strncat(szGetRequest, "\nConnection: Keep-Alive\n\n", 
+           (MAX_SIZE - strlen(szGetRequest)) - 1);
+  }
+  else 
+  {
+  strncat(szGetRequest, "\nConnection: Close\n\n", 
+         (MAX_SIZE - strlen(szGetRequest)) - 1);
   }
 }
