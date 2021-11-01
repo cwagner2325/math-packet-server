@@ -32,6 +32,7 @@ bool isEndOf(char[]);
 void errorTestResponse(char[]);
 void structureBadRequest(char[], const char*, const char*, const char*);
 void structureTimeoutRequest(char[], const char*, const char*, const char*);
+void structureContinueRequest(char[], const char*, const char*);
 
 /****************************************************************************
  Function:		main
@@ -218,6 +219,40 @@ int main(int argc, char **argv)
   send(connSocket, szGetRequest, strlen(szGetRequest), 0); 
 
   receiveMathPacket(connSocket, szGetResponse);
+  errorTestResponse(szGetResponse);
+  
+  printf("%s", szGetResponse);
+
+  close(connSocket);
+
+  printSeperator();
+  printf("\n");
+
+  connSocket = socket(AF_INET, SOCK_STREAM, 0);
+  sConnAddr.sin_family = AF_INET;
+  sConnAddr.sin_port = htons(atoi(argv[2]));
+  inet_aton(argv[1], &sConnAddr.sin_addr);
+
+  if (-1 == connSocket)
+  {
+     perror("socket failed!\n");
+     return -1;
+  }
+
+  connect(connSocket, (struct sockaddr *) &sConnAddr, sizeof(sConnAddr));
+
+  printSeperator();
+  printf("Expected Code: 401\n\n");
+
+  memset(szGetResponse, '\0', MAX_SIZE);
+  memset(szGetRequest, '\0', MAX_SIZE);
+
+  structureContinueRequest(szGetRequest, &GOOD_OPERATOR, &GOOD_OPERAND);
+  printf("%s\n", szGetRequest);
+
+  send(connSocket, szGetRequest, strlen(szGetRequest), 0); 
+  receiveMathPacket(connSocket, szGetResponse);
+  
   errorTestResponse(szGetResponse);
   
   printf("%s", szGetResponse);
@@ -430,6 +465,30 @@ void structureBadRequest(char szGetRequest[], const char* operand1,
   strncat(szGetRequest, "\nOperator: ", (MAX_SIZE - strlen(szGetRequest)) - 1 );
   szGetRequest[strlen(szGetRequest)] = *operator;
   strncat(szGetRequest, "\nOpera: ", (MAX_SIZE - strlen(szGetRequest)) - 1 );
+  szGetRequest[strlen(szGetRequest)] = *operand2;
+  strncat(szGetRequest, "\nConnection: Close\n\n", 
+         (MAX_SIZE - strlen(szGetRequest)) - 1);
+}
+/****************************************************************************
+ Function:		  structureBadRequest
+ 
+ Description:	  Structures a server request in the incorrect format
+ 
+ Parameters:	  szGetRequest - an array of chars that holds the request
+                operand1     - the first operand in the equation
+                operator     - the operator in the equation
+                operand2     - the second operand in the equation
+ 
+ Returned:		  none
+****************************************************************************/
+void structureContinueRequest(char szGetRequest[], const char* operator, 
+                                 const char* operand2)
+{
+  strncat(szGetRequest, "CONTINUE MATH/1.1", 
+         (MAX_SIZE - strlen(szGetRequest)) - 1 );
+  strncat(szGetRequest, "\nOperator: ", (MAX_SIZE - strlen(szGetRequest)) - 1 );
+  szGetRequest[strlen(szGetRequest)] = *operator;
+  strncat(szGetRequest, "\nOperand2: ", (MAX_SIZE - strlen(szGetRequest)) - 1 );
   szGetRequest[strlen(szGetRequest)] = *operand2;
   strncat(szGetRequest, "\nConnection: Close\n\n", 
          (MAX_SIZE - strlen(szGetRequest)) - 1);

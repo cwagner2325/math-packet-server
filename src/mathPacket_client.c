@@ -426,11 +426,11 @@ void errorTestResponse(char response[])
 /****************************************************************************
  Function:		  checkErrorCode
  
- Description:	  
+ Description:	  Checks the error code of a math response packet
  
- Parameters:	  respose - 
+ Parameters:	  respose - A response received from the math packet server
  
- Returned:		  none
+ Returned:		  an integer error response code
 ****************************************************************************/
 int checkErrorCode(char response[])
 {
@@ -462,11 +462,15 @@ int checkErrorCode(char response[])
   return errorCode;
 }
 /****************************************************************************
- Function:		  structureContinuePacket
+ Function:		  structureVersion1Packet
  
- Description:	  
+ Description:	  structures a request packet in the version 1.0 format for 
+                the mathPacket server
  
- Parameters:	  respose - 
+ Parameters:	  szGetRequest - an array of chars that holds the request
+                operand1     - the first operand in the equation
+                operator     - the operator in the equation
+                operand2     - the second operand in the equation 
  
  Returned:		  none
 ****************************************************************************/
@@ -487,9 +491,16 @@ void structureVersion1Packet(char szGetRequest[], char* operand1,
 /****************************************************************************
  Function:		  structureContinuePacket
  
- Description:	  
+ Description:	  structures a request to the mathPacket server in the correct 
+                continue format, if it is the last packet sent, the content in
+                connection is close, else keep-alive
  
- Parameters:	  respose - 
+ Parameters:	  szGetRequest - an array of chars that holds the request
+                operator     - the operator in the equation
+                operand2     - the second operand in the equation
+                bIsContinue  - a bool that represents if this packet is the 
+                               last packet or not, which determines if the 
+                               connection is keep-alive or close
  
  Returned:		  none
 ****************************************************************************/
