@@ -30,7 +30,7 @@ int checkErrorCode(char[]);
 bool checkHeader(char[], char[]);
 
 void formatXstrings(char[]);
-void formatStrings(char[]);
+void formatStrings(char[], bool, bool);
 void receiveMathPacket(int, char[]);
 void errorTestResponse(char[]);
 
@@ -58,7 +58,8 @@ int main(int argc, char **argv)
   char szGetResponse[MAX_SIZE];
   
   int connSocket, errorCode;
-  bool bIsDisplay = false, bIsLastPacket;
+  bool bIsDisplay = false, bIsLastPacket, bIsRounded = false;
+  bool bIsOverflow = false;
 
   struct sockaddr_in sConnAddr;
 
@@ -89,13 +90,16 @@ int main(int argc, char **argv)
   
   if (strcmp(argv[argc - 1], "-d") == 0)
   {
-    printf("%s\n", szGetRequest);
+    printf("\n%s", szGetRequest);
     bIsDisplay = true;
   }
   
   send(connSocket, szGetRequest, strlen(szGetRequest), 0);
   receiveMathPacket(connSocket, szGetResponse);
+
   errorCode = checkErrorCode(szGetResponse);
+  bIsRounded = checkHeader(szGetResponse, "Rounding");
+  bIsOverflow = checkHeader(szGetResponse, "Overflow");
 
   for (int i = 6; i < argc - 1 && OK_CODE == errorCode; i += 2)
   {
@@ -112,13 +116,24 @@ int main(int argc, char **argv)
     send(connSocket, szGetRequest, strlen(szGetRequest), 0);
     receiveMathPacket(connSocket, szGetResponse);
     errorCode = checkErrorCode(szGetResponse);
+
+    if (!bIsRounded)
+    {
+      bIsRounded = checkHeader(szGetResponse, "Rounding");
+    }
+    if (!bIsOverflow)
+    {
+      bIsOverflow = checkHeader(szGetResponse, "Overflow");
+    }
   }
 
   formatXstrings(szGetResponse);
-  formatStrings(szGetResponse);
+
+  formatStrings(szGetResponse, bIsRounded, bIsOverflow);
+
   errorTestResponse(szGetResponse);
 
-  printf("%s", szGetResponse);
+  printf("\n%s\n", szGetResponse);
   
   close(connSocket);
 
@@ -267,7 +282,7 @@ bool checkHeader(char response[], char header[])
  
  Returned:		  none
 ****************************************************************************/
-void formatStrings(char response[])
+void formatStrings(char response[], bool bIsRounded, bool bIsOverflow)
 {
   char newResponse[MAX_SIZE];
   char* pStr, *pEnd , tempChar;
@@ -276,48 +291,46 @@ void formatStrings(char response[])
 
   pStr = &response[0];
   pEnd = strstr(response, "Rounding");
+  tempChar = *pEnd;
+  *pEnd = '\0';
+  strncat(newResponse, pStr, (MAX_SIZE - strlen(newResponse)) - 1 );
+  *pEnd = tempChar;
 
-  if (NULL != pEnd)
+  while('\n' != *pEnd)
   {
-    tempChar = *pEnd;
-    *pEnd = '\0';
-    strncat(newResponse, pStr, (MAX_SIZE - strlen(newResponse)) - 1 );
-    *pEnd = tempChar;
-
-    while('\n' != *pEnd)
-    {
-      pEnd++;
-    }
-
-    while('\n' != *pEnd)
-    {
-      pEnd++;
-    }
     pEnd++;
-    
-    if (checkHeader(response, "Rounding"))
-    {
-      strncat(newResponse, "Rounded!\n", (MAX_SIZE - strlen(newResponse)) - 1 );
-    }
-    else
-    {
-      strncat(newResponse, "No Rounding\n", (MAX_SIZE - strlen(newResponse))
-              - 1 );
-    }
-
-    if (checkHeader(response, "Overflow"))
-    {
-      strncat(newResponse, "Overflow!\n", (MAX_SIZE - strlen(newResponse)) 
-              - 1 );
-    }
-    else
-    {
-      strncat(newResponse, "No Overflow\n", (MAX_SIZE - strlen(newResponse)) 
-              - 1 );
-    }
-
-    strncat(newResponse, pEnd, (MAX_SIZE - strlen(newResponse)) - 1 );
   }
+
+  while('\n' != *pEnd)
+  {
+    pEnd++;
+  }
+  pEnd++;
+    
+  if (bIsRounded)
+  {
+    strncat(newResponse, "Rounded!\n", (MAX_SIZE - strlen(newResponse)) - 1 );
+  }
+  else
+  {
+    strncat(newResponse, "No Rounding\n", (MAX_SIZE - strlen(newResponse))
+            - 1 );
+  }
+
+  if (bIsOverflow)
+  {
+    strncat(newResponse, "Overflow!\n", (MAX_SIZE - strlen(newResponse)) 
+            - 1 );
+  }
+  else
+  {
+    strncat(newResponse, "No Overflow\n", (MAX_SIZE - strlen(newResponse)) 
+            - 1 );
+  }
+
+  strncat(newResponse, pEnd, (MAX_SIZE - strlen(newResponse)) - 1 );
+  memset(response, '\0', MAX_SIZE);
+  memcpy(response, newResponse, strlen(newResponse));
 }
 /****************************************************************************
  Function:		  receiveMathPacket
@@ -393,11 +406,12 @@ void errorTestResponse(char response[])
 
   *pEnd = '\0';
 
+  strncat(newResponse, "Response Code:", (MAX_SIZE - strlen(newResponse)) 
+          - 1 );
+  strncat(newResponse, pStr, (MAX_SIZE - strlen(newResponse)) - 1 );
+
   if (OK_CODE != atoi(pStr))
   {
-    strncat(newResponse, "Response Code:", (MAX_SIZE - strlen(newResponse)) 
-            - 1 );
-    strncat(newResponse, pStr, (MAX_SIZE - strlen(newResponse)) - 1 );
     strncat(newResponse, "\nResponse Message:", (MAX_SIZE - strlen(newResponse)) 
             - 1 );
 
@@ -416,11 +430,13 @@ void errorTestResponse(char response[])
 
     memset(response, '\0', MAX_SIZE);
     memcpy(response, newResponse, strlen(newResponse));
-    response[strlen(response)] = '\0';
   }
   else
   {
     *pEnd = ' ';
+    strncat(newResponse, pEnd, (MAX_SIZE - strlen(newResponse)) - 1 );
+    memset(response, '\0', MAX_SIZE);
+    memcpy(response, newResponse, strlen(newResponse));
   }
 }
 /****************************************************************************
