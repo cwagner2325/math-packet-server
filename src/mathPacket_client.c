@@ -117,13 +117,16 @@ int main(int argc, char **argv)
     receiveMathPacket(connSocket, szGetResponse);
     errorCode = checkErrorCode(szGetResponse);
 
-    if (!bIsRounded)
+    if (OK_CODE != errorCode) 
     {
-      bIsRounded = checkHeader(szGetResponse, "Rounding");
-    }
-    if (!bIsOverflow)
-    {
-      bIsOverflow = checkHeader(szGetResponse, "Overflow");
+      if (!bIsRounded)
+      {
+        bIsRounded = checkHeader(szGetResponse, "Rounding");
+      }
+      if (!bIsOverflow)
+      {
+        bIsOverflow = checkHeader(szGetResponse, "Overflow");
+      }
     }
   }
 
@@ -291,46 +294,51 @@ void formatStrings(char response[], bool bIsRounded, bool bIsOverflow)
 
   pStr = &response[0];
   pEnd = strstr(response, "Rounding");
-  tempChar = *pEnd;
-  *pEnd = '\0';
-  strncat(newResponse, pStr, (MAX_SIZE - strlen(newResponse)) - 1 );
-  *pEnd = tempChar;
 
-  while('\n' != *pEnd)
+  if (NULL != pEnd)
   {
-    pEnd++;
-  }
+    tempChar = *pEnd;
+    *pEnd = '\0';
+    strncat(newResponse, pStr, (MAX_SIZE - strlen(newResponse)) - 1 );
+    *pEnd = tempChar;
 
-  while('\n' != *pEnd)
-  {
+    while('\n' != *pEnd)
+    {
+      pEnd++;
+    }
+
+    while('\n' != *pEnd)
+    {
+      pEnd++;
+    }
     pEnd++;
-  }
-  pEnd++;
     
-  if (bIsRounded)
-  {
-    strncat(newResponse, "Rounded!\n", (MAX_SIZE - strlen(newResponse)) - 1 );
-  }
-  else
-  {
-    strncat(newResponse, "No Rounding\n", (MAX_SIZE - strlen(newResponse))
-            - 1 );
-  }
 
-  if (bIsOverflow)
-  {
-    strncat(newResponse, "Overflow!\n", (MAX_SIZE - strlen(newResponse)) 
-            - 1 );
-  }
-  else
-  {
-    strncat(newResponse, "No Overflow\n", (MAX_SIZE - strlen(newResponse)) 
-            - 1 );
-  }
+    if (bIsRounded)
+    {
+      strncat(newResponse, "Rounded!\n", (MAX_SIZE - strlen(newResponse)) - 1 );
+    }
+    else
+    {
+      strncat(newResponse, "No Rounding\n", (MAX_SIZE - strlen(newResponse))
+              - 1 );
+    }
 
-  strncat(newResponse, pEnd, (MAX_SIZE - strlen(newResponse)) - 1 );
-  memset(response, '\0', MAX_SIZE);
-  memcpy(response, newResponse, strlen(newResponse));
+    if (bIsOverflow)
+    {
+      strncat(newResponse, "Overflow!\n", (MAX_SIZE - strlen(newResponse)) 
+              - 1 );
+    }
+    else
+    {
+      strncat(newResponse, "No Overflow\n", (MAX_SIZE - strlen(newResponse)) 
+              - 1 );
+    }
+
+    strncat(newResponse, pEnd, (MAX_SIZE - strlen(newResponse)) - 1 );  
+    memset(response, '\0', MAX_SIZE);
+    memcpy(response, newResponse, strlen(newResponse));
+  }
 }
 /****************************************************************************
  Function:		  receiveMathPacket
