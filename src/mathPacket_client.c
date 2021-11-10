@@ -563,6 +563,8 @@ void structureContinuePacket(char szGetRequest[], char* operator,
  
  Parameters:	  respose - an array of chars that is verified and reformatted
                           if necessary
+                field   - a string field that is removed from the response if 
+                          found
  
  Returned:		  none
 ****************************************************************************/
