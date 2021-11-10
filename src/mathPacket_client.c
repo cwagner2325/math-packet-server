@@ -63,7 +63,7 @@ int main(int argc, char **argv)
   
   int connSocket, errorCode;
   bool bIsDisplay = false, bIsLastPacket, bIsRounded = false;
-  bool bIsOverflow = false;
+  bool bIsOverflow = false, bVersion1 = false;
 
   struct sockaddr_in sConnAddr;
 
@@ -85,6 +85,7 @@ int main(int argc, char **argv)
 
   if (VERSION_1_SIZE[0] == argc || VERSION_1_SIZE[1] == argc)
   {
+    bVersion1 = true;
     structureVersion1Packet(szGetRequest, argv[3], argv[4], argv[5]);
   }
   else
@@ -101,7 +102,7 @@ int main(int argc, char **argv)
   send(connSocket, szGetRequest, strlen(szGetRequest), 0);
   receiveMathPacket(connSocket, szGetResponse);
 
-  if (bIsDisplay) 
+  if (bIsDisplay && !bVersion1) 
   {
     printf("%s", szGetResponse);
   }
