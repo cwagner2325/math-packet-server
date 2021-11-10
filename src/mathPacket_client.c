@@ -120,6 +120,12 @@ int main(int argc, char **argv)
 
     send(connSocket, szGetRequest, strlen(szGetRequest), 0);
     receiveMathPacket(connSocket, szGetResponse);
+
+    if (bIsDisplay) 
+    {
+      printf("%s", szGetResponse);
+    }
+
     errorCode = checkErrorCode(szGetResponse);
 
     if (OK_CODE != errorCode) 
@@ -143,7 +149,7 @@ int main(int argc, char **argv)
 
   errorTestResponse(szGetResponse);
 
-  printf("\n%s\n", szGetResponse);
+  printf("%s\n", szGetResponse);
   
   close(connSocket);
 
