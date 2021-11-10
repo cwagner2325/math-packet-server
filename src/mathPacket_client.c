@@ -149,7 +149,7 @@ int main(int argc, char **argv)
 
   errorTestResponse(szGetResponse);
 
-  printf("%s\n", szGetResponse);
+  printf("\n%s\n", szGetResponse);
   
   close(connSocket);
 
