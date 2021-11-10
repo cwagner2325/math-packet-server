@@ -33,6 +33,7 @@ void formatXstrings(char[]);
 void formatStrings(char[], bool, bool);
 void receiveMathPacket(int, char[]);
 void errorTestResponse(char[]);
+void removeField(char[], char[]);
 
 void structureVersion1Packet(char[], char*, char* , char*);
 void structureFirstRequest(char[], char*, char*, char*);
@@ -52,7 +53,10 @@ void structureContinuePacket(char[], char*, char*, bool);
 int main(int argc, char **argv)
 {
   const int MAX_SIZE = 1024, OK_CODE = 100;
-  const int  VERSION_1_SIZE[2] = { 6, 7 };
+  const int VERSION_1_SIZE[2] = { 6, 7 };
+  const int START_SECOND_PACKET = 6;
+  const int NEXT_TWO_ARGS = 2;
+  const int LAST_THREE_ARGS = 3;
 
   char szGetRequest[MAX_SIZE];
   char szGetResponse[MAX_SIZE];
@@ -101,16 +105,17 @@ int main(int argc, char **argv)
   bIsRounded = checkHeader(szGetResponse, "Rounding");
   bIsOverflow = checkHeader(szGetResponse, "Overflow");
 
-  for (int i = 6; i < argc - 1 && OK_CODE == errorCode; i += 2)
+  for (int i = START_SECOND_PACKET; i < argc - 1 && OK_CODE == errorCode; 
+       i += NEXT_TWO_ARGS)
   {
     memset(szGetRequest, '\0', sizeof(szGetRequest));
-    bIsLastPacket = (i < argc -3);
+    bIsLastPacket = (i < argc - LAST_THREE_ARGS);
 
     structureContinuePacket(szGetRequest, argv[i], argv[i+1], bIsLastPacket);
 
     if (bIsDisplay) 
     {
-      printf("%s\n", szGetRequest);
+      printf("%s", szGetRequest);
     }
 
     send(connSocket, szGetRequest, strlen(szGetRequest), 0);
@@ -133,6 +138,8 @@ int main(int argc, char **argv)
   formatXstrings(szGetResponse);
 
   formatStrings(szGetResponse, bIsRounded, bIsOverflow);
+
+  removeField(szGetResponse, "Connection");
 
   errorTestResponse(szGetResponse);
 
@@ -306,6 +313,7 @@ void formatStrings(char response[], bool bIsRounded, bool bIsOverflow)
     {
       pEnd++;
     }
+    pEnd++;
 
     while('\n' != *pEnd)
     {
@@ -313,7 +321,6 @@ void formatStrings(char response[], bool bIsRounded, bool bIsOverflow)
     }
     pEnd++;
     
-
     if (bIsRounded)
     {
       strncat(newResponse, "Rounded!\n", (MAX_SIZE - strlen(newResponse)) - 1 );
@@ -547,5 +554,46 @@ void structureContinuePacket(char szGetRequest[], char* operator,
   {
   strncat(szGetRequest, "\nConnection: Close\n\n", 
          (MAX_SIZE - strlen(szGetRequest)) - 1);
+  }
+}
+/****************************************************************************
+ Function:		  removeField
+ 
+ Description:	  removes the specified field from the response
+ 
+ Parameters:	  respose - an array of chars that is verified and reformatted
+                          if necessary
+ 
+ Returned:		  none
+****************************************************************************/
+void removeField(char response[], char field[])
+{
+  char* pStr = NULL;
+  char* pEnd = NULL;
+  char tempChar;
+  char newResponse[MAX_SIZE];
+
+  memset(newResponse, '\0', MAX_SIZE);
+
+  pStr = strstr(response, field);
+
+  if (NULL != pStr)
+  {
+    pEnd = &response[0];
+    tempChar = *pStr;
+    *pStr = '\0';
+    strncat(newResponse, pEnd, (MAX_SIZE - strlen(newResponse)) - 1 );
+    *pStr = tempChar;
+    pEnd = pStr;
+
+    while (*pEnd != '\n')
+    {
+      pEnd++;
+    }
+    pEnd++;
+    strncat(newResponse, pEnd, (MAX_SIZE - strlen(newResponse)) - 1 );
+
+    memset(response, '\0', MAX_SIZE);
+    memcpy(response, newResponse, strlen(newResponse));
   }
 }
