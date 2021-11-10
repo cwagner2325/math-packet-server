@@ -101,6 +101,11 @@ int main(int argc, char **argv)
   send(connSocket, szGetRequest, strlen(szGetRequest), 0);
   receiveMathPacket(connSocket, szGetResponse);
 
+  if (bIsDisplay) 
+  {
+    printf("%s", szGetResponse);
+  }
+
   errorCode = checkErrorCode(szGetResponse);
   bIsRounded = checkHeader(szGetResponse, "Rounding");
   bIsOverflow = checkHeader(szGetResponse, "Overflow");
@@ -121,7 +126,7 @@ int main(int argc, char **argv)
     send(connSocket, szGetRequest, strlen(szGetRequest), 0);
     receiveMathPacket(connSocket, szGetResponse);
 
-    if (bIsDisplay) 
+    if (bIsDisplay && (bIsLastPacket)) 
     {
       printf("%s", szGetResponse);
     }
