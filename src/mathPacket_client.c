@@ -63,7 +63,8 @@ int main(int argc, char **argv)
   
   int connSocket, errorCode;
   bool bIsDisplay = false, bIsLastPacket, bIsRounded = false;
-  bool bIsOverflow = false, bVersion1 = false;
+  bool bIsOverflow = false;
+  int conn;
 
   struct sockaddr_in sConnAddr;
 
@@ -81,11 +82,16 @@ int main(int argc, char **argv)
      return -1;
   }
   
-  connect(connSocket, (struct sockaddr *) &sConnAddr, sizeof(sConnAddr));
+  conn = connect(connSocket, (struct sockaddr *) &sConnAddr, sizeof(sConnAddr));
+
+  if (-1 == conn)
+  {
+     perror("Connection Failed\n");
+     return -1;
+  }
 
   if (VERSION_1_SIZE[0] == argc || VERSION_1_SIZE[1] == argc)
   {
-    bVersion1 = true;
     structureVersion1Packet(szGetRequest, argv[3], argv[4], argv[5]);
   }
   else
@@ -98,11 +104,14 @@ int main(int argc, char **argv)
     printf("\n%s", szGetRequest);
     bIsDisplay = true;
   }
+  else{
+    printf("\n");
+  }
   
   send(connSocket, szGetRequest, strlen(szGetRequest), 0);
   receiveMathPacket(connSocket, szGetResponse);
 
-  if (bIsDisplay && !bVersion1) 
+  if (bIsDisplay)
   {
     printf("%s", szGetResponse);
   }
@@ -127,12 +136,12 @@ int main(int argc, char **argv)
     send(connSocket, szGetRequest, strlen(szGetRequest), 0);
     receiveMathPacket(connSocket, szGetResponse);
 
-    if (bIsDisplay && (bIsLastPacket)) 
+    errorCode = checkErrorCode(szGetResponse);
+
+    if (bIsDisplay) 
     {
       printf("%s", szGetResponse);
     }
-
-    errorCode = checkErrorCode(szGetResponse);
 
     if (OK_CODE != errorCode) 
     {
@@ -155,7 +164,7 @@ int main(int argc, char **argv)
 
   errorTestResponse(szGetResponse);
 
-  printf("\n%s\n", szGetResponse);
+  printf("%s\n", szGetResponse);
   
   close(connSocket);
 
