@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="ASCII"?>
 <application:Application xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:advanced="http://www.eclipse.org/ui/2010/UIModel/application/ui/advanced" xmlns:application="http://www.eclipse.org/ui/2010/UIModel/application" xmlns:basic="http://www.eclipse.org/ui/2010/UIModel/application/ui/basic" xmlns:menu="http://www.eclipse.org/ui/2010/UIModel/application/ui/menu" xmi:id="_7zKfYTbcEey4hNVnaDz38g" elementId="org.eclipse.e4.legacy.ide.application" contributorURI="platform:/plugin/org.eclipse.platform" selectedElement="_7zKfYjbcEey4hNVnaDz38g" bindingContexts="_7zKfazbcEey4hNVnaDz38g">
-  <persistedState key="memento" value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?>&#xA;&lt;workbench>&#xA;&lt;mruList>&#xA;&lt;file factoryID=&quot;org.eclipse.ui.part.FileEditorInputFactory&quot; id=&quot;org.eclipse.cdt.ui.editor.CEditor&quot; name=&quot;mathPacket_errors.c&quot; tooltip=&quot;math-packet-cwagner2325_/src/mathPacket_errors.c&quot;>&#xA;&lt;persistable path=&quot;/math-packet-cwagner2325_/src/mathPacket_errors.c&quot;/>&#xA;&lt;/file>&#xA;&lt;file factoryID=&quot;org.eclipse.ui.part.FileEditorInputFactory&quot; id=&quot;org.eclipse.cdt.ui.editor.CEditor&quot; name=&quot;mathPacket_client.c&quot; tooltip=&quot;math-packet-cwagner2325_/src/mathPacket_client.c&quot;>&#xA;&lt;persistable path=&quot;/math-packet-cwagner2325_/src/mathPacket_client.c&quot;/>&#xA;&lt;/file>&#xA;&lt;file factoryID=&quot;org.eclipse.ui.part.FileEditorInputFactory&quot; id=&quot;org.eclipse.cdt.make.editor&quot; name=&quot;Makefile&quot; tooltip=&quot;math-packet-cwagner2325_/Makefile&quot;>&#xA;&lt;persistable path=&quot;/math-packet-cwagner2325_/Makefile&quot;/>&#xA;&lt;/file>&#xA;&lt;file factoryID=&quot;org.eclipse.ui.part.FileEditorInputFactory&quot; id=&quot;org.eclipse.cdt.ui.editor.CEditor&quot; name=&quot;mathPacket_server.c&quot; tooltip=&quot;math-packet-cwagner2325_/src/mathPacket_server.c&quot;>&#xA;&lt;persistable path=&quot;/math-packet-cwagner2325_/src/mathPacket_server.c&quot;/>&#xA;&lt;/file>&#xA;&lt;/mruList>&#xA;&lt;/workbench>"/>
+  <persistedState key="memento" value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?>&#xA;&lt;workbench>&#xA;&lt;mruList>&#xA;&lt;file factoryID=&quot;org.eclipse.ui.part.FileEditorInputFactory&quot; id=&quot;org.eclipse.cdt.ui.editor.CEditor&quot; name=&quot;mathPacket_errors.c&quot; tooltip=&quot;src/mathPacket_errors.c&quot;>&#xA;&lt;persistable path=&quot;/src/mathPacket_errors.c&quot;/>&#xA;&lt;/file>&#xA;&lt;file factoryID=&quot;org.eclipse.ui.part.FileEditorInputFactory&quot; id=&quot;org.eclipse.cdt.ui.editor.CEditor&quot; name=&quot;mathPacket_client.c&quot; tooltip=&quot;src/mathPacket_client.c&quot;>&#xA;&lt;persistable path=&quot;/src/mathPacket_client.c&quot;/>&#xA;&lt;/file>&#xA;&lt;file factoryID=&quot;org.eclipse.ui.part.FileEditorInputFactory&quot; id=&quot;org.eclipse.cdt.ui.editor.CEditor&quot; name=&quot;mathPacket_client.c&quot; tooltip=&quot;math-packet-cwagner2325_/src/mathPacket_client.c&quot;>&#xA;&lt;persistable path=&quot;/math-packet-cwagner2325_/src/mathPacket_client.c&quot;/>&#xA;&lt;/file>&#xA;&lt;file factoryID=&quot;org.eclipse.ui.part.FileEditorInputFactory&quot; id=&quot;org.eclipse.cdt.ui.editor.CEditor&quot; name=&quot;mathPacket_errors.c&quot; tooltip=&quot;math-packet-cwagner2325_/src/mathPacket_errors.c&quot;>&#xA;&lt;persistable path=&quot;/math-packet-cwagner2325_/src/mathPacket_errors.c&quot;/>&#xA;&lt;/file>&#xA;&lt;file factoryID=&quot;org.eclipse.ui.part.FileEditorInputFactory&quot; id=&quot;org.eclipse.cdt.make.editor&quot; name=&quot;Makefile&quot; tooltip=&quot;math-packet-cwagner2325_/Makefile&quot;>&#xA;&lt;persistable path=&quot;/math-packet-cwagner2325_/Makefile&quot;/>&#xA;&lt;/file>&#xA;&lt;file factoryID=&quot;org.eclipse.ui.part.FileEditorInputFactory&quot; id=&quot;org.eclipse.cdt.ui.editor.CEditor&quot; name=&quot;mathPacket_server.c&quot; tooltip=&quot;math-packet-cwagner2325_/src/mathPacket_server.c&quot;>&#xA;&lt;persistable path=&quot;/math-packet-cwagner2325_/src/mathPacket_server.c&quot;/>&#xA;&lt;/file>&#xA;&lt;/mruList>&#xA;&lt;/workbench>"/>
   <tags>activeSchemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
   <children xsi:type="basic:TrimmedWindow" xmi:id="_7zKfYjbcEey4hNVnaDz38g" elementId="IDEWindow" contributorURI="platform:/plugin/org.eclipse.platform" selectedElement="_9A6E4DbcEey4hNVnaDz38g" label="%trimmedwindow.label.eclipseSDK" x="0" y="0" width="1024" height="768">
     <persistedState key="coolBarVisible" value="true"/>
@@ -66,10 +66,10 @@
           <tags>persp.showIn:org.eclipse.tm.terminal.view.ui.TerminalsView</tags>
           <tags>persp.viewSC:org.eclipse.cdt.make.ui.views.MakeView</tags>
           <tags>persp.actionSet:org.eclipse.cdt.make.ui.makeTargetActionSet</tags>
-          <children xsi:type="basic:PartSashContainer" xmi:id="_9XCs8TbcEey4hNVnaDz38g" selectedElement="_9XCs9jbcEey4hNVnaDz38g" horizontal="true">
-            <children xsi:type="basic:PartStack" xmi:id="_9XCs8jbcEey4hNVnaDz38g" elementId="topLeft" toBeRendered="false" containerData="2500">
-              <tags>noFocus</tags>
-              <children xsi:type="advanced:Placeholder" xmi:id="_9XCs8zbcEey4hNVnaDz38g" elementId="org.eclipse.ui.navigator.ProjectExplorer" toBeRendered="false" ref="_9Wuj4DbcEey4hNVnaDz38g" closeable="true">
+          <children xsi:type="basic:PartSashContainer" xmi:id="_9XCs8TbcEey4hNVnaDz38g" selectedElement="_9XCs8jbcEey4hNVnaDz38g" horizontal="true">
+            <children xsi:type="basic:PartStack" xmi:id="_9XCs8jbcEey4hNVnaDz38g" elementId="topLeft" containerData="2500" selectedElement="_9XCs8zbcEey4hNVnaDz38g">
+              <tags>active</tags>
+              <children xsi:type="advanced:Placeholder" xmi:id="_9XCs8zbcEey4hNVnaDz38g" elementId="org.eclipse.ui.navigator.ProjectExplorer" ref="_9Wuj4DbcEey4hNVnaDz38g" closeable="true">
                 <tags>View</tags>
                 <tags>categoryTag:General</tags>
               </children>
@@ -100,7 +100,7 @@
                   </children>
                 </children>
               </children>
-              <children xsi:type="basic:PartStack" xmi:id="_9XCs_TbcEey4hNVnaDz38g" elementId="bottom" containerData="2500" selectedElement="_9XCs_jbcEey4hNVnaDz38g">
+              <children xsi:type="basic:PartStack" xmi:id="_9XCs_TbcEey4hNVnaDz38g" elementId="bottom" containerData="2500" selectedElement="_9XCtADbcEey4hNVnaDz38g">
                 <children xsi:type="advanced:Placeholder" xmi:id="_9XCs_jbcEey4hNVnaDz38g" elementId="org.eclipse.ui.views.ProblemView" ref="_9WvyATbcEey4hNVnaDz38g" closeable="true">
                   <tags>View</tags>
                   <tags>categoryTag:General</tags>
@@ -170,20 +170,17 @@
       <tags>categoryTag:Help</tags>
     </sharedElements>
     <sharedElements xsi:type="advanced:Area" xmi:id="_9WmoEDbcEey4hNVnaDz38g" elementId="org.eclipse.ui.editorss" selectedElement="_9WmoETbcEey4hNVnaDz38g">
-      <children xsi:type="basic:PartStack" xmi:id="_9WmoETbcEey4hNVnaDz38g" elementId="org.eclipse.e4.primaryDataStack" selectedElement="_IKBsYDbzEeys__0pBx-Lew">
+      <children xsi:type="basic:PartStack" xmi:id="_9WmoETbcEey4hNVnaDz38g" elementId="org.eclipse.e4.primaryDataStack" selectedElement="_Z1-mkENxEeyNk51L2ThlIg">
         <tags>org.eclipse.e4.primaryDataStack</tags>
         <tags>EditorStack</tags>
-        <tags>active</tags>
-        <children xsi:type="basic:Part" xmi:id="_IKBsYDbzEeys__0pBx-Lew" elementId="org.eclipse.e4.ui.compatibility.editor" contributionURI="bundleclass://org.eclipse.ui.workbench/org.eclipse.ui.internal.e4.compatibility.CompatibilityEditor" label="mathPacket_client.c" iconURI="platform:/plugin/org.eclipse.cdt.ui/icons/obj16/c_file_obj.gif" closeable="true">
-          <persistedState key="memento" value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?>&#xA;&lt;editor id=&quot;org.eclipse.cdt.ui.editor.CEditor&quot; name=&quot;mathPacket_client.c&quot; partName=&quot;mathPacket_client.c&quot; title=&quot;mathPacket_client.c&quot; tooltip=&quot;math-packet-cwagner2325_/src/mathPacket_client.c&quot;>&#xA;&lt;input factoryID=&quot;org.eclipse.ui.part.FileEditorInputFactory&quot; path=&quot;/math-packet-cwagner2325_/src/mathPacket_client.c&quot;/>&#xA;&lt;editorState selectionHorizontalPixel=&quot;0&quot; selectionLength=&quot;0&quot; selectionOffset=&quot;0&quot; selectionTopPixel=&quot;1116&quot;/>&#xA;&lt;/editor>"/>
+        <children xsi:type="basic:Part" xmi:id="_Z1-mkENxEeyNk51L2ThlIg" elementId="org.eclipse.e4.ui.compatibility.editor" contributionURI="bundleclass://org.eclipse.ui.workbench/org.eclipse.ui.internal.e4.compatibility.CompatibilityEditor" label="mathPacket_client.c" iconURI="platform:/plugin/org.eclipse.cdt.ui/icons/obj16/c_file_obj.gif" closeable="true">
+          <persistedState key="memento" value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?>&#xA;&lt;editor id=&quot;org.eclipse.cdt.ui.editor.CEditor&quot; name=&quot;mathPacket_client.c&quot; partName=&quot;mathPacket_client.c&quot; title=&quot;mathPacket_client.c&quot; tooltip=&quot;src/mathPacket_client.c&quot;>&#xA;&lt;input factoryID=&quot;org.eclipse.ui.part.FileEditorInputFactory&quot; path=&quot;/src/mathPacket_client.c&quot;/>&#xA;&lt;editorState selectionHorizontalPixel=&quot;0&quot; selectionLength=&quot;0&quot; selectionOffset=&quot;1700&quot; selectionTopPixel=&quot;900&quot;/>&#xA;&lt;/editor>"/>
           <tags>Editor</tags>
           <tags>removeOnHide</tags>
           <tags>org.eclipse.cdt.ui.editor.CEditor</tags>
-          <tags>active</tags>
-          <tags>activeOnClose</tags>
         </children>
-        <children xsi:type="basic:Part" xmi:id="_M0TDIDbzEeys__0pBx-Lew" elementId="org.eclipse.e4.ui.compatibility.editor" contributionURI="bundleclass://org.eclipse.ui.workbench/org.eclipse.ui.internal.e4.compatibility.CompatibilityEditor" label="mathPacket_errors.c" iconURI="platform:/plugin/org.eclipse.cdt.ui/icons/obj16/c_file_obj.gif" closeable="true">
-          <persistedState key="memento" value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?>&#xA;&lt;editor id=&quot;org.eclipse.cdt.ui.editor.CEditor&quot; name=&quot;mathPacket_errors.c&quot; partName=&quot;mathPacket_errors.c&quot; title=&quot;mathPacket_errors.c&quot; tooltip=&quot;math-packet-cwagner2325_/src/mathPacket_errors.c&quot;>&#xA;&lt;input factoryID=&quot;org.eclipse.ui.part.FileEditorInputFactory&quot; path=&quot;/math-packet-cwagner2325_/src/mathPacket_errors.c&quot;/>&#xA;&lt;editorState selectionHorizontalPixel=&quot;0&quot; selectionLength=&quot;0&quot; selectionOffset=&quot;0&quot; selectionTopPixel=&quot;0&quot;/>&#xA;&lt;/editor>"/>
+        <children xsi:type="basic:Part" xmi:id="_aDDZQENxEeyNk51L2ThlIg" elementId="org.eclipse.e4.ui.compatibility.editor" contributionURI="bundleclass://org.eclipse.ui.workbench/org.eclipse.ui.internal.e4.compatibility.CompatibilityEditor" label="mathPacket_errors.c" iconURI="platform:/plugin/org.eclipse.cdt.ui/icons/obj16/c_file_obj.gif" closeable="true">
+          <persistedState key="memento" value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?>&#xA;&lt;editor id=&quot;org.eclipse.cdt.ui.editor.CEditor&quot; name=&quot;mathPacket_errors.c&quot; partName=&quot;mathPacket_errors.c&quot; title=&quot;mathPacket_errors.c&quot; tooltip=&quot;src/mathPacket_errors.c&quot;>&#xA;&lt;input factoryID=&quot;org.eclipse.ui.part.FileEditorInputFactory&quot; path=&quot;/src/mathPacket_errors.c&quot;/>&#xA;&lt;editorState selectionHorizontalPixel=&quot;0&quot; selectionLength=&quot;0&quot; selectionOffset=&quot;0&quot; selectionTopPixel=&quot;1670&quot;/>&#xA;&lt;/editor>"/>
           <tags>Editor</tags>
           <tags>removeOnHide</tags>
           <tags>org.eclipse.cdt.ui.editor.CEditor</tags>
@@ -196,6 +193,8 @@
       <persistedState key="memento" value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?>&#xA;&lt;view CommonNavigator.LINKING_ENABLED=&quot;0&quot; currentWorkingSetName=&quot;Aggregate for window 1635308320930&quot; org.eclipse.cdt.ui.cview.groupincludes=&quot;false&quot; org.eclipse.cdt.ui.cview.groupmacros=&quot;false&quot; org.eclipse.cdt.ui.editor.CUChildren=&quot;true&quot; org.eclipse.ui.navigator.resources.workingSets.showTopLevelWorkingSets=&quot;0&quot;>&#xA;&lt;lastRecentlyUsedFilters/>&#xA;&lt;/view>"/>
       <tags>View</tags>
       <tags>categoryTag:General</tags>
+      <tags>active</tags>
+      <tags>activeOnClose</tags>
       <menus xmi:id="_9fIR8DbcEey4hNVnaDz38g" elementId="org.eclipse.ui.navigator.ProjectExplorer">
         <tags>ViewMenu</tags>
         <tags>menuContribution:menu</tags>
@@ -235,8 +234,14 @@
     <sharedElements xsi:type="basic:Part" xmi:id="_9WyOQDbcEey4hNVnaDz38g" elementId="org.eclipse.ui.console.ConsoleView" contributionURI="bundleclass://org.eclipse.ui.workbench/org.eclipse.ui.internal.e4.compatibility.CompatibilityView" label="Console" iconURI="platform:/plugin/org.eclipse.ui.console/icons/full/cview16/console_view.png" tooltip="" closeable="true">
       <persistedState key="originalCompatibilityViewClass" value="org.eclipse.ui.internal.console.ConsoleView"/>
       <persistedState key="originalCompatibilityViewBundle" value="org.eclipse.ui.console"/>
+      <persistedState key="memento" value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?>&#xA;&lt;view/>"/>
       <tags>View</tags>
       <tags>categoryTag:General</tags>
+      <menus xmi:id="_rfpBYENwEey5q7XAh9Ba6Q" elementId="org.eclipse.ui.console.ConsoleView">
+        <tags>ViewMenu</tags>
+        <tags>menuContribution:menu</tags>
+      </menus>
+      <toolbar xmi:id="_rfpBYUNwEey5q7XAh9Ba6Q" elementId="org.eclipse.ui.console.ConsoleView" visible="false"/>
     </sharedElements>
     <sharedElements xsi:type="basic:Part" xmi:id="_9Wy1UDbcEey4hNVnaDz38g" elementId="org.eclipse.ui.views.PropertySheet" contributionURI="bundleclass://org.eclipse.ui.workbench/org.eclipse.ui.internal.e4.compatibility.CompatibilityView" label="Properties" iconURI="platform:/plugin/org.eclipse.ui.views/icons/full/eview16/prop_ps.png" tooltip="" closeable="true">
       <persistedState key="originalCompatibilityViewClass" value="org.eclipse.ui.views.properties.PropertySheet"/>
@@ -288,7 +293,7 @@
       </children>
       <children xsi:type="menu:ToolBar" xmi:id="_9KUfkDbcEey4hNVnaDz38g" elementId="org.eclipse.ui.workbench.file">
         <tags>Draggable</tags>
-        <children xsi:type="menu:HandledToolItem" xmi:id="_Wc-0oDbzEeyU4bz5rTTAwg" elementId="print" visible="false" iconURI="platform:/plugin/org.eclipse.ui/icons/full/etool16/print_edit.png" tooltip="Print" command="_70lbwzbcEey4hNVnaDz38g"/>
+        <children xsi:type="menu:HandledToolItem" xmi:id="_l4WzUENxEeywzowa_CaREg" elementId="print" visible="false" iconURI="platform:/plugin/org.eclipse.ui/icons/full/etool16/print_edit.png" tooltip="Print" command="_70lbwzbcEey4hNVnaDz38g"/>
       </children>
       <children xsi:type="menu:ToolBar" xmi:id="_9KUfkTbcEey4hNVnaDz38g" elementId="group.edit" toBeRendered="false">
         <tags>toolbarSeparator</tags>
@@ -319,7 +324,7 @@
       </children>
       <children xsi:type="menu:ToolBar" xmi:id="_9KYJ8DbcEey4hNVnaDz38g" elementId="org.eclipse.ui.workbench.navigate">
         <tags>Draggable</tags>
-        <children xsi:type="menu:HandledToolItem" xmi:id="_WdIloDbzEeyU4bz5rTTAwg" elementId="org.eclipse.ui.window.pinEditor" iconURI="platform:/plugin/org.eclipse.ui/icons/full/etool16/pin_editor.png" tooltip="Pin Editor" type="Check" command="_70k0xzbcEey4hNVnaDz38g"/>
+        <children xsi:type="menu:HandledToolItem" xmi:id="_l4Z2oENxEeywzowa_CaREg" elementId="org.eclipse.ui.window.pinEditor" iconURI="platform:/plugin/org.eclipse.ui/icons/full/etool16/pin_editor.png" tooltip="Pin Editor" enabled="false" type="Check" command="_70k0xzbcEey4hNVnaDz38g"/>
       </children>
       <children xsi:type="menu:ToolBar" xmi:id="_9KYJ8TbcEey4hNVnaDz38g" elementId="group.editor" toBeRendered="false">
         <tags>toolbarSeparator</tags>
@@ -2677,7 +2682,7 @@
   <addons xmi:id="_7zKfdzbcEey4hNVnaDz38g" elementId="MinMax Addon" contributorURI="platform:/plugin/org.eclipse.platform" contributionURI="bundleclass://org.eclipse.e4.ui.workbench.addons.swt/org.eclipse.e4.ui.workbench.addons.minmax.MinMaxAddon"/>
   <addons xmi:id="_7zKfeDbcEey4hNVnaDz38g" elementId="org.eclipse.ui.workbench.addon.0" contributorURI="platform:/plugin/org.eclipse.platform" contributionURI="bundleclass://org.eclipse.e4.ui.workbench/org.eclipse.e4.ui.internal.workbench.addons.HandlerProcessingAddon"/>
   <addons xmi:id="_7zfPgDbcEey4hNVnaDz38g" elementId="SplitterAddon" contributionURI="bundleclass://org.eclipse.e4.ui.workbench.addons.swt/org.eclipse.e4.ui.workbench.addons.splitteraddon.SplitterAddon"/>
-  <addons xmi:id="_IYS0IKimEeS11vbz3f9ezw" elementId="org.eclipse.ui.ide.addon.0" contributorURI="platform:/plugin/org.eclipse.ui.ide" contributionURI="bundleclass://org.eclipse.ui.ide/org.eclipse.ui.internal.ide.addons.SaveAllDirtyPartsAddon"/>
+  <addons xmi:id="_lkOWYUNxEeywzowa_CaREg" elementId="org.eclipse.ui.ide.addon.0" contributionURI="bundleclass://org.eclipse.ui.ide/org.eclipse.ui.internal.ide.addons.SaveAllDirtyPartsAddon"/>
   <addons xmi:id="_dz0JgGOlEeSMMaPQU2nlzw" elementId="org.eclipse.ui.ide.application.addon.0" contributorURI="platform:/plugin/org.eclipse.ui.ide.application" contributionURI="bundleclass://org.eclipse.ui.ide.application/org.eclipse.ui.internal.ide.application.addons.ModelCleanupAddon"/>
   <categories xmi:id="_70O2YDbcEey4hNVnaDz38g" elementId="org.eclipse.ui.category.edit" name="Edit"/>
   <categories xmi:id="_70O2YTbcEey4hNVnaDz38g" elementId="org.eclipse.mylyn.wikitext.ui.editor.category" name="WikiText Markup Editing Commands" description="commands for editing lightweight markup"/>
