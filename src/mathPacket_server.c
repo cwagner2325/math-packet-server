@@ -1,3 +1,12 @@
+//***************************************************************************
+// File name:		mathPacket_server.c
+// Author:			Cayden Wagner
+// Date:				November 162021
+// Class:				CS 360
+// Assignment:	mathPacket_server
+// Purpose:			To provide a server that handles mathPacket requests from the
+//              client and responds appropriately
+//***************************************************************************
 #define _GNU_SOURCE
 
 #include <sys/types.h>
@@ -16,6 +25,7 @@ const int MAX_SIZE = 1024;
 bool isEndOf(char[]);
 void receiveMathPacket(int, char[]);
 bool isLastPacket(char[]);
+bool isContinuePacket(char[]);
 
 int main(int argc, char **argv)
 {
@@ -78,7 +88,16 @@ int main(int argc, char **argv)
     printf("Incoming\n%s", szGetRequest);
 
     bIsLastPacket = isLastPacket(szGetRequest);
-    
+
+    if (isContinuePacket(szGetRequest))
+    {
+      printf("Continue\n");
+    }
+    else
+    {
+      printf("Calculate\n");
+    }
+
     close(connSocket);
   }
 
@@ -106,7 +125,7 @@ bool isEndOf(char response[])
  
  Description:	  receives a  response from the server
  
- Parameters:	  connSocket - the socket that is configured to the server
+ Parameters:	  connSocket    - the socket that is configured to the server
                 szGetResponse - a char array that contains the received
                                 response
  
@@ -139,15 +158,15 @@ void receiveMathPacket(int connSocket, char szGetResponse[])
   memcpy(szGetResponse, newResponse, strlen(newResponse));
 }
 /****************************************************************************
- Function:		  receiveMathPacket
+ Function:		  isLastPacket
  
- Description:	  receives a  response from the server
+ Description:	  determines if the request has specifies a connection close or
+                not
  
- Parameters:	  connSocket - the socket that is configured to the server
-                szGetResponse - a char array that contains the received
+ Parameters:	  szGetResponse - a char array that contains the received
                                 response
  
- Returned:		  none
+ Returned:		  true if the packet specifies connection close, else false
 ****************************************************************************/
 bool isLastPacket(char szGetRequest[])
 {
@@ -183,4 +202,21 @@ bool isLastPacket(char szGetRequest[])
   *pEnd = '\n';
 
   return bIsLastPacket;
+}
+/****************************************************************************
+ Function:		  isContinuePacket
+ 
+ Description:	  determines if the request is a CALCULATE protocol
+ 
+ Parameters:	  szGetResponse - a char array that contains the received
+                                response
+ 
+ Returned:		  
+****************************************************************************/
+bool isContinuePacket(char szGetRequest[])
+{
+  char* pStr;
+  pStr = strstr(szGetRequest, "CONTINUE");
+
+  return (NULL != pStr);
 }
