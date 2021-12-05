@@ -26,13 +26,13 @@ bool isEndOf(char[]);
 void receiveMathPacket(int, char[]);
 bool isLastPacket(char[]);
 bool isContinuePacket(char[]);
+bool isCurrentVersion (char[]);
+void structureBadVersionPacket(char[]);
 
 int main(int argc, char **argv)
 {
   int socketfd, connSocket, result;
-
   bool bIsLastPacket = false;
-
   char szGetRequest[MAX_SIZE], szResponse[MAX_SIZE];
 
   struct sockaddr_in sAddr, sConnAddr;
@@ -41,7 +41,6 @@ int main(int argc, char **argv)
   memset(szGetRequest, '\0', MAX_SIZE);
   memset(szResponse, '\0', MAX_SIZE);
 
-  
   socketfd = socket(AF_INET, SOCK_STREAM, 0);
 
   if ( -1 == socketfd ) 
@@ -87,19 +86,22 @@ int main(int argc, char **argv)
     receiveMathPacket(connSocket, szGetRequest);
     printf("Incoming\n%s", szGetRequest);
 
-    bIsLastPacket = isLastPacket(szGetRequest);
-
-    if (isContinuePacket(szGetRequest))
+    if(isCurrentVersion(szGetRequest))
     {
-      printf("Continue\n");
+
     }
     else
     {
-      printf("Calculate\n");
+      //send 500 error packet and close connection
+      bIsLastPacket = isLastPacket(szGetRequest);
+      structureBadVersionPacket(szResponse);
+      send(connSocket, szResponse, strlen(szResponse), 0);
     }
 
-    close(connSocket);
+    bIsLastPacket = isLastPacket(szGetRequest);
   }
+
+  close(connSocket);
 
   return EXIT_SUCCESS;
 }
@@ -219,4 +221,36 @@ bool isContinuePacket(char szGetRequest[])
   pStr = strstr(szGetRequest, "CONTINUE");
 
   return (NULL != pStr);
+}
+/****************************************************************************
+ Function:		  
+ 
+ Description:	  
+ 
+ Parameters:	  
+ 
+ Returned:		  
+****************************************************************************/
+bool isCurrentVersion (char szGetRequest[])
+{
+  char* pStr;
+  pStr = strstr(szGetRequest, "MATH/1.1");
+  return (NULL != pStr);
+}
+/****************************************************************************
+ Function:		  
+ 
+ Description:	  
+ 
+ Parameters:	  
+ 
+ Returned:		  
+****************************************************************************/
+void structureBadVersionPacket(char response[])
+{
+  memset(response, '\0', MAX_SIZE);
+  strncat(response, 
+        "MATH/1.1 500 OlderCodeDoesNotCheckout\nConnection: Close\n\n", 
+         (MAX_SIZE - strlen(response)) - 1 );
+  memset(response, '\0', MAX_SIZE);
 }
