@@ -104,7 +104,8 @@ int main(int argc, char **argv)
     printf("\n%s", szGetRequest);
     bIsDisplay = true;
   }
-  else{
+  else
+  {
     printf("\n");
   }
   

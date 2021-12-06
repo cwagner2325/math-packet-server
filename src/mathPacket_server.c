@@ -8,6 +8,7 @@
 //              client and responds appropriately
 //***************************************************************************
 #define _GNU_SOURCE
+#define NUM_OPERANDS 4
 
 #include <sys/types.h>
 #include <arpa/inet.h>
@@ -28,6 +29,8 @@ bool isLastPacket(char[]);
 bool isContinuePacket(char[]);
 bool isCurrentVersion (char[]);
 void structureBadVersionPacket(char[]);
+bool errorCheckOperator(char[]);
+void structureBadOperatorPacket(char[]);
 
 int main(int argc, char **argv)
 {
@@ -86,19 +89,28 @@ int main(int argc, char **argv)
     receiveMathPacket(connSocket, szGetRequest);
     printf("Incoming\n%s", szGetRequest);
 
-    if(isCurrentVersion(szGetRequest))
+    if (isCurrentVersion(szGetRequest))
     {
-
+      if (errorCheckOperator(szGetRequest))
+      {
+        //send bad operanbd and close connection
+        bIsLastPacket = true;
+        structureBadOperatorPacket(szResponse);
+        send(connSocket, szResponse, strlen(szResponse), 0);
+      }
+      else 
+      {
+        //track result and send continue packet
+        bIsLastPacket = isLastPacket(szGetRequest);
+      }  
     }
     else
     {
       //send 500 error packet and close connection
-      bIsLastPacket = isLastPacket(szGetRequest);
+      bIsLastPacket = true;
       structureBadVersionPacket(szResponse);
       send(connSocket, szResponse, strlen(szResponse), 0);
     }
-
-    bIsLastPacket = isLastPacket(szGetRequest);
   }
 
   close(connSocket);
@@ -250,7 +262,59 @@ void structureBadVersionPacket(char response[])
 {
   memset(response, '\0', MAX_SIZE);
   strncat(response, 
-        "MATH/1.1 500 OlderCodeDoesNotCheckout\nConnection: Close\n\n", 
+         "MATH/1.1 500 OlderCodeDoesNotCheckout\nConnection: Close\n\n", 
          (MAX_SIZE - strlen(response)) - 1 );
+}
+/****************************************************************************
+ Function:		  
+ 
+ Description:	  
+ 
+ Parameters:	  
+ 
+ Returned:		  
+****************************************************************************/
+bool errorCheckOperator(char request[])
+{
+  const char OPERANDS[NUM_OPERANDS] = "+-/%";
+  char* pStr;
+  bool bError = false;
+
+  pStr = strstr(request, "Operator");
+  
+  if (NULL != pStr)
+  {
+    while (!isspace(*pStr))
+    {
+      pStr++;
+    }
+    
+    pStr++;
+
+    for (int i = 0; i < NUM_OPERANDS; i++)
+    {
+      if (*pStr == OPERANDS[i])
+      {
+        bError = true;
+      }
+    }
+  }
+
+return !bError;
+}
+/****************************************************************************
+ Function:		  
+ 
+ Description:	  
+ 
+ Parameters:	  
+ 
+ Returned:		  
+****************************************************************************/
+void structureBadOperatorPacket(char response[])
+{
   memset(response, '\0', MAX_SIZE);
+  strncat(response, 
+         "MATH/1.1 200 BAD_OPERATOR\nConnection: Close\n\n", 
+         (MAX_SIZE - strlen(response)) - 1 );
 }
