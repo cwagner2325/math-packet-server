@@ -8,7 +8,7 @@
 //              client and responds appropriately
 //***************************************************************************
 #define _GNU_SOURCE
-#define NUM_OPERANDS 4
+#define NUM_OPERANDS 5
 
 #include <sys/types.h>
 #include <arpa/inet.h>
@@ -26,10 +26,10 @@ const int MAX_SIZE = 1024;
 bool isEndOf(char[]);
 void receiveMathPacket(int, char[]);
 bool isLastPacket(char[]);
-bool isContinuePacket(char[]);
 bool isCurrentVersion (char[]);
+bool isContinuePacket(char[]);
 void structureBadVersionPacket(char[]);
-bool errorCheckOperator(char[]);
+bool isInvalidOperator(char[]);
 void structureBadOperatorPacket(char[]);
 
 int main(int argc, char **argv)
@@ -91,22 +91,28 @@ int main(int argc, char **argv)
 
     if (isCurrentVersion(szGetRequest))
     {
-      if (errorCheckOperator(szGetRequest))
+      if (isInvalidOperator(szGetRequest))
       {
-        //send bad operanbd and close connection
         bIsLastPacket = true;
         structureBadOperatorPacket(szResponse);
         send(connSocket, szResponse, strlen(szResponse), 0);
       }
       else 
       {
-        //track result and send continue packet
         bIsLastPacket = isLastPacket(szGetRequest);
+        if(!isContinuePacket(szGetRequest))
+        {
+          //use two operands and operator to calculate
+        }
+        else 
+        {
+          //use last result and new operator and operand to calculate
+        }
+        //structure packet using response and send
       }  
     }
     else
     {
-      //send 500 error packet and close connection
       bIsLastPacket = true;
       structureBadVersionPacket(szResponse);
       send(connSocket, szResponse, strlen(szResponse), 0);
@@ -235,13 +241,14 @@ bool isContinuePacket(char szGetRequest[])
   return (NULL != pStr);
 }
 /****************************************************************************
- Function:		  
+ Function:		  isCurrentVersion
  
- Description:	  
+ Description:	  checks if the received packet is from the current server 1.1
+                version
  
- Parameters:	  
+ Parameters:	  szGetRequest - an array of chars containing the request packet
  
- Returned:		  
+ Returned:		  true if the packet contains version 1.1, else false
 ****************************************************************************/
 bool isCurrentVersion (char szGetRequest[])
 {
@@ -250,13 +257,14 @@ bool isCurrentVersion (char szGetRequest[])
   return (NULL != pStr);
 }
 /****************************************************************************
- Function:		  
+ Function:		  structureBadVersionPacket
  
- Description:	  
+ Description:	  structures the error response for a bad version packet
  
- Parameters:	  
+ Parameters:	  response - an array of chars that is filled with the error 
+                           response
  
- Returned:		  
+ Returned:		  none
 ****************************************************************************/
 void structureBadVersionPacket(char response[])
 {
@@ -266,17 +274,17 @@ void structureBadVersionPacket(char response[])
          (MAX_SIZE - strlen(response)) - 1 );
 }
 /****************************************************************************
- Function:		  
+ Function:		  isInvalidOperator
  
- Description:	  
+ Description:	  checks if the request packet contains one of the valid operators
  
- Parameters:	  
+ Parameters:	  request - an array of chars containing the request
  
- Returned:		  
+ Returned:		  true if the packet has an invalid operator, else false
 ****************************************************************************/
-bool errorCheckOperator(char request[])
+bool isInvalidOperator(char request[])
 {
-  const char OPERANDS[NUM_OPERANDS] = "+-/%";
+  const char OPERANDS[NUM_OPERANDS] = "x+-/%";
   char* pStr;
   bool bError = false;
 
@@ -288,7 +296,7 @@ bool errorCheckOperator(char request[])
     {
       pStr++;
     }
-    
+
     pStr++;
 
     for (int i = 0; i < NUM_OPERANDS; i++)
@@ -303,13 +311,14 @@ bool errorCheckOperator(char request[])
 return !bError;
 }
 /****************************************************************************
- Function:		  
+ Function:		  structureBadOperatorPacket
  
- Description:	  
+ Description:	  strctures the error response for a bad operator
  
- Parameters:	  
+ Parameters:	  response - an array of chars that is filled with the error 
+                           response
  
- Returned:		  
+ Returned:		  none
 ****************************************************************************/
 void structureBadOperatorPacket(char response[])
 {
