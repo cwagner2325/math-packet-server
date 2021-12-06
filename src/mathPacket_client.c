@@ -530,7 +530,7 @@ int checkErrorCode(char response[])
 void structureVersion1Packet(char szGetRequest[], char* operand1, 
                              char* operator, char* operand2)
 {
-  strncat(szGetRequest, "CALCULATE MATH/1.0\n", 
+  strncat(szGetRequest, "CALCULATE MATH/1.1\n", 
          (MAX_SIZE - strlen(szGetRequest)) - 1 );
   strncat(szGetRequest, "Operand1: ", (MAX_SIZE - strlen(szGetRequest)) - 1 );
   strncat(szGetRequest, operand1, (MAX_SIZE - strlen(szGetRequest)) - 1 );

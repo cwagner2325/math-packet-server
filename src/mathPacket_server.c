@@ -31,12 +31,17 @@ bool isContinuePacket(char[]);
 void structureBadVersionPacket(char[]);
 bool isInvalidOperator(char[]);
 void structureBadOperatorPacket(char[]);
+int calculateResult(int, char, int);
+int getOperand(char[], char[]);
+char getField(char[], char[]);
+void structureResponse(char[], int, bool, bool);
 
 int main(int argc, char **argv)
 {
-  int socketfd, connSocket, result;
+  int socketfd, connSocket, result, calculation = 0;
   bool bIsLastPacket = false;
   char szGetRequest[MAX_SIZE], szResponse[MAX_SIZE];
+  char operand1, operand2, operator;
 
   struct sockaddr_in sAddr, sConnAddr;
   socklen_t addrLen = sizeof(struct sockaddr_in); 
@@ -75,16 +80,17 @@ int main(int argc, char **argv)
     return EXIT_FAILURE;
   }
 
+  connSocket = accept(socketfd, &sConnAddr, &addrLen);
+
+  if ( -1 == connSocket )
+  {
+    perror("Accept:");
+    close(socketfd);
+    return EXIT_FAILURE;
+  }
+
   while(!bIsLastPacket)
   {
-    connSocket = accept(socketfd, &sConnAddr, &addrLen);
-
-    if ( -1 == connSocket )
-    {
-      perror("Accept:");
-      close(socketfd);
-      return EXIT_FAILURE;
-    }
 
     receiveMathPacket(connSocket, szGetRequest);
     printf("Incoming\n%s", szGetRequest);
@@ -100,16 +106,23 @@ int main(int argc, char **argv)
       else 
       {
         bIsLastPacket = isLastPacket(szGetRequest);
-        if(!isContinuePacket(szGetRequest))
+        if (!isContinuePacket(szGetRequest))
         {
-          //use two operands and operator to calculate
+          operand1 = getOperand(szGetRequest, "Operand1");
+          operator = getField(szGetRequest, "Operator");
+          operand2 = getOperand(szGetRequest, "Operand2");
+          calculation = calculateResult(operand1, operator, operand2);
         }
         else 
         {
-          //use last result and new operator and operand to calculate
+          operator = getField(szGetRequest, "Operator");
+          operand2 = getOperand(szGetRequest, "Operand2");
+          calculation = calculateResult(calculation, operator, operand2);
         }
-        //structure packet using response and send
-      }  
+        structureResponse(szResponse, calculation, bIsLastPacket, false);
+        printf("Outgoing\n%s", szResponse);
+        send(connSocket, szResponse, strlen(szResponse), 0);
+      } 
     }
     else
     {
@@ -190,25 +203,10 @@ void receiveMathPacket(int connSocket, char szGetResponse[])
 ****************************************************************************/
 bool isLastPacket(char szGetRequest[])
 {
-  char* pStr, *pEnd, *pIsFound;
+  char *pIsFound;
   bool bIsLastPacket;
-  pStr = strstr(szGetRequest, "Connection");
 
-  while (!isspace(*pStr))
-  {
-    pStr++;
-  }
-  pEnd = pStr;
-  pEnd++;
-
-  while ('\n' != *pEnd)
-  {
-    pEnd++;
-  }
-
-  *pEnd = '\0';
-
-  pIsFound = strstr(pStr, "Close");
+  pIsFound = strstr(szGetRequest, "Close");
 
   if (NULL != pIsFound)
   {
@@ -218,8 +216,6 @@ bool isLastPacket(char szGetRequest[])
   {
     bIsLastPacket = false;
   }
-  
-  *pEnd = '\n';
 
   return bIsLastPacket;
 }
@@ -252,9 +248,18 @@ bool isContinuePacket(char szGetRequest[])
 ****************************************************************************/
 bool isCurrentVersion (char szGetRequest[])
 {
+  bool bCurr;
   char* pStr;
   pStr = strstr(szGetRequest, "MATH/1.1");
-  return (NULL != pStr);
+  if (NULL != pStr)
+  {
+    bCurr = true;
+  }
+  else 
+  {
+    bCurr = false;
+  }
+  return (bCurr);
 }
 /****************************************************************************
  Function:		  structureBadVersionPacket
@@ -326,4 +331,134 @@ void structureBadOperatorPacket(char response[])
   strncat(response, 
          "MATH/1.1 200 BAD_OPERATOR\nConnection: Close\n\n", 
          (MAX_SIZE - strlen(response)) - 1 );
+}
+/****************************************************************************
+ Function:		  
+ 
+ Description:	  
+ 
+ Parameters:	 
+ 
+ Returned:		 
+****************************************************************************/
+int calculateResult(int operand1, char operator, int operand2)
+{
+  int result = -1;
+
+  if ('+' == operator)
+  {
+    result = operand1 + operand2;
+  }
+  else if ('-' == operator)
+  {
+    result = operand1 - operand2;
+  }
+  else if ('%' == operator)
+  {
+    result = operand1 % operand2;
+  }
+  else if ('x' == operator)
+  {
+    result = operand1 * operand2;
+  }
+  else if ('/' == operator)
+  {
+    result = operand1 / operand2;
+  }
+  return result;
+}
+/****************************************************************************
+ Function:		  
+ 
+ Description:	  
+ 
+ Parameters:	 
+ 
+ Returned:		 
+****************************************************************************/
+char getField(char request[], char field[])
+{
+  char* pStr;
+
+  pStr = strstr(request, field);
+
+  while (!isspace(*pStr))
+  {
+    pStr++;
+  }
+  pStr++;
+
+  return *pStr;
+}
+/****************************************************************************
+ Function:		  
+ 
+ Description:	  
+ 
+ Parameters:	  szGetRequest - an array of chars that holds the request
+                operand1     - the first operand in the equation
+                operator     - the operator in the equation
+                operand2     - the second operand in the equation 
+ 
+ Returned:		  
+****************************************************************************/
+void structureResponse(char szResponse[], int result, bool bRounded, bool 
+                             bConnClose)
+{
+  char integerString[32];
+  memset(integerString, '\0', 32);
+
+  sprintf(integerString, "%d", result);
+
+  memset(szResponse, '\0', MAX_SIZE);
+  strncat(szResponse, "MATH/1.1 100 OK\nResult: ", 
+          (MAX_SIZE - strlen(szResponse)) - 1 );
+  strncat(szResponse, integerString, (MAX_SIZE - strlen(szResponse)) - 1 );
+  strncat(szResponse, "\nRounding: ", (MAX_SIZE - strlen(szResponse)) - 1 );
+  if(bRounded)
+  {
+    strncat(szResponse, "True\n", (MAX_SIZE - strlen(szResponse)) - 1 );
+  }
+  else
+  {
+    strncat(szResponse, "False\n", (MAX_SIZE - strlen(szResponse)) - 1 );
+  }
+  strncat(szResponse, "Overflow: False\nX-Server-Version: 1.1.0\nConnection: ",
+         (MAX_SIZE - strlen(szResponse)) - 1 );
+  if(bConnClose)
+  {
+    strncat(szResponse, "Close\n\n", (MAX_SIZE - strlen(szResponse)) - 1 );
+  }
+  else
+  {
+    strncat(szResponse, "Keep-Alive\n\n", (MAX_SIZE - strlen(szResponse)) - 1 );
+  }
+}
+
+int getOperand(char request[], char field[])
+{
+  {
+  int temp;
+  char* pStr, *pEnd;
+
+  pStr = strstr(request, field);
+
+  while (!isspace(*pStr))
+  {
+    pStr++;
+  }
+  pStr++;
+
+  pEnd = pStr;
+  while('\n' != *pEnd)
+  {
+    pEnd++;
+  }
+
+  *pEnd = '\0';
+  temp = atoi(pStr);
+  *pEnd = '\n';
+
+  return temp;
+}
 }
