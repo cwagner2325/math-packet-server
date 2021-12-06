@@ -70,7 +70,6 @@ int main(int argc, char **argv)
   while ( -1 == result )
   {
     perror("Bind:");
-    close (socketfd);
     sleep(30);
     result = bind(socketfd, &sAddr, sizeof(struct sockaddr_in));
   }
