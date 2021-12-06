@@ -144,7 +144,7 @@ int main(int argc, char **argv)
       printf("%s", szGetResponse);
     }
 
-    if (OK_CODE != errorCode) 
+    if (OK_CODE == errorCode) 
     {
       if (!bIsRounded)
       {

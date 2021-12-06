@@ -23,23 +23,27 @@
 #include <stdbool.h>
 
 const int MAX_SIZE = 1024;
-bool isEndOf(char[]);
+
 void receiveMathPacket(int, char[]);
+
+bool isEndOf(char[]);
 bool isLastPacket(char[]);
 bool isCurrentVersion (char[]);
 bool isContinuePacket(char[]);
-void structureBadVersionPacket(char[]);
 bool isInvalidOperator(char[]);
-void structureBadOperatorPacket(char[]);
-int calculateResult(int, char, int);
+
 int getOperand(char[], char[]);
 char getField(char[], char[]);
+int calculateResult(int, char, int);
+
 void structureResponse(char[], int, bool, bool);
+void structureBadVersionPacket(char[]);
+void structureBadOperatorPacket(char[]);
 
 int main(int argc, char **argv)
 {
   int socketfd, connSocket, result, calculation = 0;
-  bool bIsLastPacket = false;
+  bool bIsLastPacket = false, bRounded = false;
   char szGetRequest[MAX_SIZE], szResponse[MAX_SIZE];
   char operand1, operand2, operator;
 
@@ -91,7 +95,6 @@ int main(int argc, char **argv)
 
   while(!bIsLastPacket)
   {
-
     receiveMathPacket(connSocket, szGetRequest);
     printf("Incoming\n%s", szGetRequest);
 
@@ -105,21 +108,35 @@ int main(int argc, char **argv)
       }
       else 
       {
-        bIsLastPacket = isLastPacket(szGetRequest);
         if (!isContinuePacket(szGetRequest))
         {
           operand1 = getOperand(szGetRequest, "Operand1");
           operator = getField(szGetRequest, "Operator");
           operand2 = getOperand(szGetRequest, "Operand2");
           calculation = calculateResult(operand1, operator, operand2);
+          if ('/' == operator && !bRounded)
+          {
+            if (operand1 % operand2 != 0)
+            {
+              bRounded = true;
+            }
+          }
         }
         else 
         {
           operator = getField(szGetRequest, "Operator");
           operand2 = getOperand(szGetRequest, "Operand2");
+          if ('/' == operator && !bRounded)
+          {
+            if (calculation % operand2 != 0)
+            {
+              bRounded = true;
+            }
+          }
           calculation = calculateResult(calculation, operator, operand2);
         }
-        structureResponse(szResponse, calculation, bIsLastPacket, false);
+        bIsLastPacket = isLastPacket(szGetRequest);
+        structureResponse(szResponse, calculation, bRounded, bIsLastPacket);
         printf("Outgoing\n%s", szResponse);
         send(connSocket, szResponse, strlen(szResponse), 0);
       } 
@@ -209,7 +226,7 @@ bool isLastPacket(char szGetRequest[])
   pIsFound = strstr(szGetRequest, "Close");
 
   if (NULL != pIsFound)
-  {
+  { 
     bIsLastPacket = true;
   }
   else 
@@ -333,13 +350,16 @@ void structureBadOperatorPacket(char response[])
          (MAX_SIZE - strlen(response)) - 1 );
 }
 /****************************************************************************
- Function:		  
+ Function:		  calculateResult
  
- Description:	  
+ Description:	  takes two operands and performs a calculation on them using the 
+                operator
  
- Parameters:	 
+ Parameters:	  operand1 - the first operand in the calculation
+                operator - the operator in the calculation
+                operand2 - the second operand in the calculation
  
- Returned:		 
+ Returned:		  an integer that is calculated
 ****************************************************************************/
 int calculateResult(int operand1, char operator, int operand2)
 {
@@ -368,13 +388,14 @@ int calculateResult(int operand1, char operator, int operand2)
   return result;
 }
 /****************************************************************************
- Function:		  
+ Function:		  getField
  
- Description:	  
+ Description:	   gets the cahr value held in a specified field
  
- Parameters:	 
+ Parameters:	   request - an array of chars holding the request
+                 field   - an array of chars holding the field that is requested
  
- Returned:		 
+ Returned:		   a char that is held in the specified field
 ****************************************************************************/
 char getField(char request[], char field[])
 {
@@ -393,14 +414,17 @@ char getField(char request[], char field[])
 /****************************************************************************
  Function:		  
  
- Description:	  
+ Description:	  strctures a response in the correct format
  
- Parameters:	  szGetRequest - an array of chars that holds the request
-                operand1     - the first operand in the equation
-                operator     - the operator in the equation
-                operand2     - the second operand in the equation 
+ Parameters:	  szResponse     - an array of chars that holds the response
+                result         - an integer value that is the result of the 
+                                 calculation
+                bRounded       - a bool that represents if the calculation has 
+                                 been rounded or not
+                bConnClose     - a bool that represents if the connection should
+                                 be closed or not
  
- Returned:		  
+ Returned:		  none
 ****************************************************************************/
 void structureResponse(char szResponse[], int result, bool bRounded, bool 
                              bConnClose)
@@ -415,7 +439,7 @@ void structureResponse(char szResponse[], int result, bool bRounded, bool
           (MAX_SIZE - strlen(szResponse)) - 1 );
   strncat(szResponse, integerString, (MAX_SIZE - strlen(szResponse)) - 1 );
   strncat(szResponse, "\nRounding: ", (MAX_SIZE - strlen(szResponse)) - 1 );
-  if(bRounded)
+  if (bRounded)
   {
     strncat(szResponse, "True\n", (MAX_SIZE - strlen(szResponse)) - 1 );
   }
@@ -425,7 +449,7 @@ void structureResponse(char szResponse[], int result, bool bRounded, bool
   }
   strncat(szResponse, "Overflow: False\nX-Server-Version: 1.1.0\nConnection: ",
          (MAX_SIZE - strlen(szResponse)) - 1 );
-  if(bConnClose)
+  if (bConnClose)
   {
     strncat(szResponse, "Close\n\n", (MAX_SIZE - strlen(szResponse)) - 1 );
   }
@@ -434,7 +458,18 @@ void structureResponse(char szResponse[], int result, bool bRounded, bool
     strncat(szResponse, "Keep-Alive\n\n", (MAX_SIZE - strlen(szResponse)) - 1 );
   }
 }
-
+/****************************************************************************
+ Function:		  getOperand
+ 
+ Description:	  gets the operand in the specified field
+ 
+ Parameters:	  szGetRequest - an array of chars that holds the request
+                operand1     - the first operand in the equation
+                operator     - the operator in the equation
+                operand2     - the second operand in the equation 
+ 
+ Returned:		  an integer that is contained in the field
+****************************************************************************/
 int getOperand(char request[], char field[])
 {
   {
@@ -460,5 +495,5 @@ int getOperand(char request[], char field[])
   *pEnd = '\n';
 
   return temp;
-}
+  }
 }

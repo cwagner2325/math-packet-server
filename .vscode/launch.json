@@ -30,7 +30,7 @@
       "type": "cppdbg",
       "request": "launch",
       "program": "${workspaceFolder}/bin/mathPacket_server", // THIS IS IMPORTANT
-      "args": ["8080"],
+      "args": ["8083"],
       "stopAtEntry": true, // THIS IS IMPORTANT 
       "cwd": "${fileDirname}",
       "environment": [],
